@@ -24,6 +24,11 @@ const App = {
     },
 
     async init() {
+        // Initialize Lucide icons
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+
         // Apply saved theme
         const savedTheme = localStorage.getItem(AppConfig.STORAGE_KEYS.THEME) || 'light';
         applyTheme(savedTheme);
@@ -265,7 +270,13 @@ const App = {
         }
 
         // Update mobile/desktop view after render
-        setTimeout(() => this.updateMobileView(), 50);
+        setTimeout(() => {
+            this.updateMobileView();
+            // Refresh Lucide icons for dynamically added content
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        }, 50);
     },
 
     showAddNewMenu() {

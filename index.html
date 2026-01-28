@@ -20,8 +20,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-  <!-- Icons -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lucide-static@0.263.1/font/lucide.min.css">
+  <!-- Icons - Lucide -->
+  <script src="https://unpkg.com/lucide@latest"></script>
 
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -54,23 +54,23 @@
 
       <nav class="sidebar-nav">
         <a href="#dashboard" class="nav-item active" data-page="dashboard">
-          <i class="lucide-layout-dashboard"></i>
+          <i data-lucide="layout-dashboard"></i>
           <span>Dashboard</span>
         </a>
         <a href="#contacts" class="nav-item" data-page="contacts">
-          <i class="lucide-users"></i>
+          <i data-lucide="users"></i>
           <span>Liên hệ</span>
         </a>
         <a href="#companies" class="nav-item" data-page="companies">
-          <i class="lucide-building-2"></i>
+          <i data-lucide="building-2"></i>
           <span>Công ty</span>
         </a>
         <a href="#deals" class="nav-item" data-page="deals">
-          <i class="lucide-trending-up"></i>
+          <i data-lucide="trending-up"></i>
           <span>Deals</span>
         </a>
         <a href="#tasks" class="nav-item" data-page="tasks">
-          <i class="lucide-check-square"></i>
+          <i data-lucide="check-square"></i>
           <span>Công việc</span>
           <span class="badge" id="taskBadge" style="display:none">0</span>
         </a>
@@ -78,10 +78,10 @@
 
       <div class="sidebar-footer">
         <button class="btn-icon" id="themeToggle" title="Chuyển theme">
-          <i class="lucide-moon"></i>
+          <i data-lucide="moon"></i>
         </button>
         <button class="btn-icon" id="settingsBtn" title="Cài đặt">
-          <i class="lucide-settings"></i>
+          <i data-lucide="settings"></i>
         </button>
       </div>
     </aside>
@@ -92,19 +92,19 @@
       <header class="main-header">
         <div class="header-left">
           <button class="btn-icon mobile-menu" id="mobileMenuBtn">
-            <i class="lucide-menu"></i>
+            <i data-lucide="menu"></i>
           </button>
           <h1 class="page-title" id="pageTitle">Dashboard</h1>
         </div>
 
         <div class="header-right">
           <div class="search-box">
-            <i class="lucide-search"></i>
+            <i data-lucide="search"></i>
             <input type="text" id="globalSearch" placeholder="Tìm kiếm...">
           </div>
 
           <button class="btn btn-primary" id="addNewBtn">
-            <i class="lucide-plus"></i>
+            <i data-lucide="plus"></i>
             <span>Thêm mới</span>
           </button>
         </div>
