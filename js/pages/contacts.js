@@ -98,6 +98,11 @@ const ContactsPage = {
     `;
 
         this.initEventListeners();
+
+        // Initialize Lucide icons for dynamically rendered content
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
     },
 
     renderContactRow(contact) {

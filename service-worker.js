@@ -33,7 +33,6 @@ const STATIC_FILES = [
 // External resources to cache
 const EXTERNAL_RESOURCES = [
     'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap',
-    'https://cdn.jsdelivr.net/npm/lucide-static@0.263.1/font/lucide.min.css',
     'https://cdn.jsdelivr.net/npm/chart.js',
     'https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js'
 ];
