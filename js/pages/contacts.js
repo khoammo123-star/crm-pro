@@ -3,39 +3,39 @@
 // =====================================================
 
 const ContactsPage = {
-    currentPage: 1,
-    currentFilters: {},
+  currentPage: 1,
+  currentFilters: {},
 
-    async render() {
-        const container = document.getElementById('contactsPage');
-        container.innerHTML = '<div class="loading-spinner" style="margin: 40px auto;"></div>';
+  async render() {
+    const container = document.getElementById('contactsPage');
+    container.innerHTML = '<div class="loading-spinner" style="margin: 40px auto;"></div>';
 
-        try {
-            await this.loadContacts();
-        } catch (error) {
-            container.innerHTML = Components.emptyState(
-                '⚠️',
-                'Không thể tải dữ liệu',
-                error.message,
-                'Thử lại',
-                'ContactsPage.render()'
-            );
-        }
-    },
+    try {
+      await this.loadContacts();
+    } catch (error) {
+      container.innerHTML = Components.emptyState(
+        '⚠️',
+        'Không thể tải dữ liệu',
+        error.message,
+        'Thử lại',
+        'ContactsPage.render()'
+      );
+    }
+  },
 
-    async loadContacts() {
-        const container = document.getElementById('contactsPage');
+  async loadContacts() {
+    const container = document.getElementById('contactsPage');
 
-        const params = {
-            page: this.currentPage,
-            limit: 20,
-            ...this.currentFilters
-        };
+    const params = {
+      page: this.currentPage,
+      limit: 20,
+      ...this.currentFilters
+    };
 
-        const result = await API.getContacts(params);
-        const { data: contacts, pagination } = result;
+    const result = await API.getContacts(params);
+    const { data: contacts, pagination } = result;
 
-        container.innerHTML = `
+    container.innerHTML = `
       <!-- Toolbar -->
       <div class="list-toolbar">
         <div class="filter-group">
@@ -97,18 +97,19 @@ const ContactsPage = {
       </div>
     `;
 
-        this.initEventListeners();
+    this.initEventListeners();
 
-        // Initialize Lucide icons for dynamically rendered content
-        if (typeof lucide !== 'undefined') {
-            lucide.createIcons();
-        }
-    },
+    // Initialize Lucide icons for dynamically rendered content
+    if (typeof lucide !== 'undefined') {
+      lucide.createIcons();
+    }
+  },
 
-    renderContactRow(contact) {
-        const company = contact.company;
+  renderContactRow(contact) {
+    const company = contact.company;
+    const zaloPhone = contact.zalo_phone || contact.phone;
 
-        return `
+    return `
       <tr>
         <td>
           <div class="contact-row">
@@ -126,6 +127,11 @@ const ContactsPage = {
         <td>${Utils.formatDate(contact.created_at)}</td>
         <td>
           <div class="table-actions">
+            ${zaloPhone ? `
+              <a href="https://zalo.me/${zaloPhone.replace(/\D/g, '')}" target="_blank" class="btn-icon btn-zalo" title="Chat Zalo" onclick="event.stopPropagation()">
+                <img src="icons/zalo.svg" width="18" height="18" alt="Zalo">
+              </a>
+            ` : ''}
             <button class="btn-icon" onclick="ContactsPage.viewContact('${contact.id}')" title="Xem">
               <i data-lucide="eye"></i>
             </button>
@@ -139,14 +145,15 @@ const ContactsPage = {
         </td>
       </tr>
     `;
-    },
+  },
 
-    // Mobile card view for contacts
-    renderContactCard(contact) {
-        const company = contact.company;
-        const fullName = Utils.getFullName(contact.first_name, contact.last_name);
+  // Mobile card view for contacts
+  renderContactCard(contact) {
+    const company = contact.company;
+    const fullName = Utils.getFullName(contact.first_name, contact.last_name);
+    const zaloPhone = contact.zalo_phone || contact.phone;
 
-        return `
+    return `
       <div class="mobile-card" onclick="ContactsPage.viewContact('${contact.id}')">
         <div class="mobile-card-header">
           <div style="display: flex; align-items: center; gap: 12px;">
@@ -172,6 +179,12 @@ const ContactsPage = {
               <span class="mobile-card-value">${contact.phone}</span>
             </div>
           ` : ''}
+          ${contact.reminder_date ? `
+            <div class="mobile-card-row">
+              <span class="mobile-card-label">🔔 Nhắc gọi</span>
+              <span class="mobile-card-value">${Utils.formatDate(contact.reminder_date)}</span>
+            </div>
+          ` : ''}
           <div class="mobile-card-row">
             <span class="mobile-card-label">📅 Ngày tạo</span>
             <span class="mobile-card-value">${Utils.formatDate(contact.created_at)}</span>
@@ -179,6 +192,11 @@ const ContactsPage = {
         </div>
         
         <div class="mobile-card-actions" onclick="event.stopPropagation()">
+          ${zaloPhone ? `
+            <a href="https://zalo.me/${zaloPhone.replace(/\\D/g, '')}" target="_blank" class="btn btn-sm btn-zalo" title="Chat Zalo">
+              <img src="icons/zalo.svg" width="16" height="16" alt="Zalo"> Zalo
+            </a>
+          ` : ''}
           <button class="btn btn-sm btn-secondary" onclick="ContactsPage.viewContact('${contact.id}')">
             <i data-lucide="eye"></i> Xem
           </button>
@@ -191,99 +209,105 @@ const ContactsPage = {
         </div>
       </div>
     `;
-    },
+  },
 
-    initEventListeners() {
-        // Search
-        const searchInput = document.getElementById('contactSearch');
-        if (searchInput) {
-            searchInput.addEventListener('input', Utils.debounce((e) => {
-                this.currentFilters.search = e.target.value;
-                this.currentPage = 1;
-                this.loadContacts();
-            }, 500));
+  initEventListeners() {
+    // Search
+    const searchInput = document.getElementById('contactSearch');
+    if (searchInput) {
+      searchInput.addEventListener('input', Utils.debounce((e) => {
+        this.currentFilters.search = e.target.value;
+        this.currentPage = 1;
+        this.loadContacts();
+      }, 500));
+    }
+
+    // Status filter
+    const statusFilter = document.getElementById('contactStatusFilter');
+    if (statusFilter) {
+      statusFilter.addEventListener('change', (e) => {
+        this.currentFilters.status = e.target.value;
+        this.currentPage = 1;
+        this.loadContacts();
+      });
+    }
+
+    // Pagination
+    document.querySelectorAll('.pagination-btn[data-page]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const page = parseInt(btn.dataset.page);
+        if (page && !btn.disabled) {
+          this.currentPage = page;
+          this.loadContacts();
         }
+      });
+    });
+  },
 
-        // Status filter
-        const statusFilter = document.getElementById('contactStatusFilter');
-        if (statusFilter) {
-            statusFilter.addEventListener('change', (e) => {
-                this.currentFilters.status = e.target.value;
-                this.currentPage = 1;
-                this.loadContacts();
-            });
-        }
+  // View contact in Drawer (side panel)
+  viewContact(id) {
+    if (typeof Drawer !== 'undefined') {
+      Drawer.open(id);
+    } else {
+      // Fallback to edit modal
+      this.openEditModal(id);
+    }
+  },
 
-        // Pagination
-        document.querySelectorAll('.pagination-btn[data-page]').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const page = parseInt(btn.dataset.page);
-                if (page && !btn.disabled) {
-                    this.currentPage = page;
-                    this.loadContacts();
-                }
-            });
-        });
-    },
+  // Confirm delete
+  confirmDelete(id) {
+    if (confirm('Bạn có chắc chắn muốn xóa liên hệ này?')) {
+      this.deleteContact(id);
+    }
+  },
 
-    // View contact in Drawer (side panel)
-    viewContact(id) {
-        if (typeof Drawer !== 'undefined') {
-            Drawer.open(id);
-        } else {
-            // Fallback to edit modal
-            this.openEditModal(id);
-        }
-    },
+  openCreateModal() {
+    const content = this.renderContactForm();
 
-    // Confirm delete
-    confirmDelete(id) {
-        if (confirm('Bạn có chắc chắn muốn xóa liên hệ này?')) {
-            this.deleteContact(id);
-        }
-    },
+    Components.openModal('Thêm liên hệ mới', content, {
+      confirmText: 'Tạo liên hệ',
+      onConfirm: () => this.createContact()
+    });
+  },
 
-    openCreateModal() {
-        const content = this.renderContactForm();
+  async openEditModal(id) {
+    Components.showLoading();
 
-        Components.openModal('Thêm liên hệ mới', content, {
-            confirmText: 'Tạo liên hệ',
-            onConfirm: () => this.createContact()
-        });
-    },
+    try {
+      const result = await API.getContact(id);
+      const contact = result.data;
 
-    async openEditModal(id) {
-        Components.showLoading();
+      Components.hideLoading();
 
-        try {
-            const result = await API.getContact(id);
-            const contact = result.data;
+      const content = this.renderContactForm(contact);
 
-            Components.hideLoading();
+      Components.openModal('Sửa liên hệ', content, {
+        confirmText: 'Lưu thay đổi',
+        onConfirm: () => this.updateContact(id)
+      });
 
-            const content = this.renderContactForm(contact);
+    } catch (error) {
+      Components.hideLoading();
+      Components.toast(error.message, 'error');
+    }
+  },
 
-            Components.openModal('Sửa liên hệ', content, {
-                confirmText: 'Lưu thay đổi',
-                onConfirm: () => this.updateContact(id)
-            });
+  renderContactForm(contact = {}) {
+    const sources = AppData.sources || ['Website', 'Facebook', 'Zalo', 'Giới thiệu', 'Khác'];
+    const statuses = AppData.contactStatuses || [
+      { id: 'lead', name: 'Lead' },
+      { id: 'prospect', name: 'Tiềm năng' },
+      { id: 'customer', name: 'Khách hàng' },
+      { id: 'inactive', name: 'Không hoạt động' }
+    ];
+    const priorities = [
+      { id: 'low', name: '🔵 Thấp' },
+      { id: 'normal', name: '🟢 Bình thường' },
+      { id: 'high', name: '🟠 Cao' },
+      { id: 'urgent', name: '🔴 Khẩn cấp' }
+    ];
 
-        } catch (error) {
-            Components.hideLoading();
-            Components.toast(error.message, 'error');
-        }
-    },
-
-    renderContactForm(contact = {}) {
-        const sources = AppData.sources || ['Website', 'Facebook', 'Zalo', 'Giới thiệu', 'Khác'];
-        const statuses = AppData.contactStatuses || [
-            { id: 'lead', name: 'Lead' },
-            { id: 'prospect', name: 'Tiềm năng' },
-            { id: 'customer', name: 'Khách hàng' },
-            { id: 'inactive', name: 'Không hoạt động' }
-        ];
-
-        return `
+    return `
       <form id="contactForm">
         <div class="form-row">
           ${Components.formField('first_name', 'Tên', 'text', { value: contact.first_name, required: true, placeholder: 'Nhập tên' })}
@@ -299,101 +323,131 @@ const ContactsPage = {
         
         <div class="form-row">
           ${Components.formField('status', 'Trạng thái', 'select', {
-            value: contact.status || 'lead',
-            options: statuses.map(s => ({ value: s.id, label: s.name }))
-        })}
+      value: contact.status || 'lead',
+      options: statuses.map(s => ({ value: s.id, label: s.name }))
+    })}
           ${Components.formField('source', 'Nguồn', 'select', {
-            value: contact.source,
-            options: [{ value: '', label: '-- Chọn nguồn --' }, ...sources.map(s => ({ value: s, label: s }))]
-        })}
+      value: contact.source,
+      options: [{ value: '', label: '-- Chọn nguồn --' }, ...sources.map(s => ({ value: s, label: s }))]
+    })}
         </div>
         
         ${Components.formField('address', 'Địa chỉ', 'text', { value: contact.address })}
         
-        ${Components.formField('notes', 'Ghi chú', 'textarea', { value: contact.notes })}
+        <hr style="margin: 20px 0; border: none; border-top: 1px solid var(--border-color);">
+        <h4 style="margin-bottom: 15px; color: var(--text-secondary);">📅 Lịch hẹn & Nhắc nhở</h4>
+        
+        <div class="form-row">
+          ${Components.formField('expected_need_date', 'Ngày cần SP', 'date', {
+      value: contact.expected_need_date,
+      hint: 'Khi nào khách dự kiến cần sản phẩm'
+    })}
+          ${Components.formField('reminder_date', 'Ngày nhắc gọi', 'date', {
+      value: contact.reminder_date,
+      hint: 'Hệ thống sẽ nhắc bạn gọi vào ngày này'
+    })}
+        </div>
+        
+        <div class="form-row">
+          ${Components.formField('care_priority', 'Mức ưu tiên', 'select', {
+      value: contact.care_priority || 'normal',
+      options: priorities.map(p => ({ value: p.id, label: p.name }))
+    })}
+          ${Components.formField('zalo_phone', 'SĐT Zalo', 'tel', {
+      value: contact.zalo_phone,
+      placeholder: 'Nếu khác SĐT chính'
+    })}
+        </div>
+        
+        ${Components.formField('reminder_note', 'Ghi chú nhắc nhở', 'textarea', {
+      value: contact.reminder_note,
+      placeholder: 'VD: Hỏi về đơn hàng, giới thiệu sản phẩm mới...'
+    })}
+        
+        ${Components.formField('notes', 'Ghi chú chung', 'textarea', { value: contact.notes })}
       </form>
     `;
-    },
+  },
 
-    async createContact() {
-        const form = document.getElementById('contactForm');
+  async createContact() {
+    const form = document.getElementById('contactForm');
 
-        if (!Components.validateForm(form)) {
-            Components.toast('Vui lòng điền đầy đủ thông tin bắt buộc', 'error');
-            return;
-        }
+    if (!Components.validateForm(form)) {
+      Components.toast('Vui lòng điền đầy đủ thông tin bắt buộc', 'error');
+      return;
+    }
 
-        const data = Components.getFormData(form);
+    const data = Components.getFormData(form);
 
-        Components.showLoading('Đang tạo...');
+    Components.showLoading('Đang tạo...');
 
-        try {
-            await API.createContact(data);
-            Components.hideLoading();
-            Components.closeModal();
-            Components.toast('Tạo liên hệ thành công!', 'success');
-            this.loadContacts();
-        } catch (error) {
-            Components.hideLoading();
-            Components.toast(error.message, 'error');
-        }
-    },
+    try {
+      await API.createContact(data);
+      Components.hideLoading();
+      Components.closeModal();
+      Components.toast('Tạo liên hệ thành công!', 'success');
+      this.loadContacts();
+    } catch (error) {
+      Components.hideLoading();
+      Components.toast(error.message, 'error');
+    }
+  },
 
-    async updateContact(id) {
-        const form = document.getElementById('contactForm');
+  async updateContact(id) {
+    const form = document.getElementById('contactForm');
 
-        if (!Components.validateForm(form)) {
-            Components.toast('Vui lòng điền đầy đủ thông tin bắt buộc', 'error');
-            return;
-        }
+    if (!Components.validateForm(form)) {
+      Components.toast('Vui lòng điền đầy đủ thông tin bắt buộc', 'error');
+      return;
+    }
 
-        const data = Components.getFormData(form);
+    const data = Components.getFormData(form);
 
-        Components.showLoading('Đang lưu...');
+    Components.showLoading('Đang lưu...');
 
-        try {
-            await API.updateContact(id, data);
-            Components.hideLoading();
-            Components.closeModal();
-            Components.toast('Cập nhật thành công!', 'success');
-            this.loadContacts();
-        } catch (error) {
-            Components.hideLoading();
-            Components.toast(error.message, 'error');
-        }
-    },
+    try {
+      await API.updateContact(id, data);
+      Components.hideLoading();
+      Components.closeModal();
+      Components.toast('Cập nhật thành công!', 'success');
+      this.loadContacts();
+    } catch (error) {
+      Components.hideLoading();
+      Components.toast(error.message, 'error');
+    }
+  },
 
-    async deleteContact(id) {
-        const confirmed = await Components.confirm(
-            'Bạn có chắc muốn xóa liên hệ này?',
-            { title: 'Xác nhận xóa', danger: true, confirmText: 'Xóa' }
-        );
+  async deleteContact(id) {
+    const confirmed = await Components.confirm(
+      'Bạn có chắc muốn xóa liên hệ này?',
+      { title: 'Xác nhận xóa', danger: true, confirmText: 'Xóa' }
+    );
 
-        if (!confirmed) return;
+    if (!confirmed) return;
 
-        Components.showLoading('Đang xóa...');
+    Components.showLoading('Đang xóa...');
 
-        try {
-            await API.deleteContact(id);
-            Components.hideLoading();
-            Components.toast('Đã xóa liên hệ', 'success');
-            this.loadContacts();
-        } catch (error) {
-            Components.hideLoading();
-            Components.toast(error.message, 'error');
-        }
-    },
+    try {
+      await API.deleteContact(id);
+      Components.hideLoading();
+      Components.toast('Đã xóa liên hệ', 'success');
+      this.loadContacts();
+    } catch (error) {
+      Components.hideLoading();
+      Components.toast(error.message, 'error');
+    }
+  },
 
-    async viewContact(id) {
-        Components.showLoading();
+  async viewContact(id) {
+    Components.showLoading();
 
-        try {
-            const result = await API.getContact(id);
-            const contact = result.data;
+    try {
+      const result = await API.getContact(id);
+      const contact = result.data;
 
-            Components.hideLoading();
+      Components.hideLoading();
 
-            const content = `
+      const content = `
         <div class="detail-header">
           ${Components.avatar(contact.first_name, contact.last_name, 'lg')}
           <div class="detail-info">
@@ -455,14 +509,14 @@ const ContactsPage = {
         </div>
       `;
 
-            Components.openModal('Chi tiết liên hệ', content, {
-                size: 'lg',
-                hideFooter: true
-            });
+      Components.openModal('Chi tiết liên hệ', content, {
+        size: 'lg',
+        hideFooter: true
+      });
 
-        } catch (error) {
-            Components.hideLoading();
-            Components.toast(error.message, 'error');
-        }
+    } catch (error) {
+      Components.hideLoading();
+      Components.toast(error.message, 'error');
     }
+  }
 };

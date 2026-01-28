@@ -100,6 +100,36 @@
     color: var(--primary-600);
 }
 
+/* Zalo button */
+.btn-zalo {
+    background: #0068FF !important;
+    color: white !important;
+    border-color: #0068FF !important;
+}
+
+.btn-zalo:hover {
+    background: #0052CC !important;
+    transform: translateY(-1px);
+}
+
+.btn-icon.btn-zalo {
+    background: rgba(0, 104, 255, 0.1);
+    color: #0068FF;
+}
+
+.btn-icon.btn-zalo:hover {
+    background: #0068FF;
+    color: white;
+}
+
+/* Info box for settings */
+.info-box {
+    background: var(--bg-secondary);
+    padding: var(--spacing-3);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-color-light);
+}
+
 /* === FORMS === */
 .form-group {
     margin-bottom: var(--spacing-4);
