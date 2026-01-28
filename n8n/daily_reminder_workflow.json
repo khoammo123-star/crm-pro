@@ -1,0 +1,236 @@
+{
+    "name": "CRM Pro - Daily Reminder Automation",
+    "nodes": [
+        {
+            "parameters": {
+                "rule": {
+                    "interval": [
+                        {
+                            "field": "hours",
+                            "triggerAtHour": 8
+                        }
+                    ]
+                }
+            },
+            "name": "Schedule Trigger",
+            "type": "n8n-nodes-base.scheduleTrigger",
+            "typeVersion": 1.1,
+            "position": [
+                250,
+                300
+            ],
+            "notes": "Chạy mỗi ngày lúc 8:00 sáng"
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "={{$env.SUPABASE_URL}}/rest/v1/rpc/get_due_reminders",
+                "authentication": "genericCredentialType",
+                "genericAuthType": "httpHeaderAuth",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "apikey",
+                            "value": "={{$env.SUPABASE_ANON_KEY}}"
+                        },
+                        {
+                            "name": "Content-Type",
+                            "value": "application/json"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "name": "Get Due Reminders",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.1,
+            "position": [
+                450,
+                300
+            ],
+            "notes": "Lấy danh sách khách cần gọi hôm nay từ Supabase"
+        },
+        {
+            "parameters": {
+                "conditions": {
+                    "number": [
+                        {
+                            "value1": "={{ $json.length }}",
+                            "operation": "larger",
+                            "value2": 0
+                        }
+                    ]
+                }
+            },
+            "name": "Has Reminders?",
+            "type": "n8n-nodes-base.if",
+            "typeVersion": 1,
+            "position": [
+                650,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "mode": "runOnceForEachItem"
+            },
+            "name": "Split Contacts",
+            "type": "n8n-nodes-base.splitInBatches",
+            "typeVersion": 3,
+            "position": [
+                850,
+                200
+            ]
+        },
+        {
+            "parameters": {
+                "resource": "message",
+                "chatId": "={{$env.TELEGRAM_CHAT_ID}}",
+                "text": "=🔔 **Nhắc nhở liên hệ khách**\n\n👤 **Khách hàng:** {{ $json.first_name }} {{ $json.last_name }}\n📞 **SĐT:** {{ $json.phone || 'Chưa có' }}\n📧 **Email:** {{ $json.email || 'Chưa có' }}\n⚡ **Mức ưu tiên:** {{ $json.care_priority }}\n📅 **Ngày cần SP:** {{ $json.expected_need_date || 'Chưa đặt' }}\n📝 **Ghi chú:** {{ $json.reminder_note || 'Không có' }}\n\n🔗 [Mở CRM]({{$env.CRM_URL}}/contacts/{{ $json.id }})",
+                "additionalFields": {
+                    "parse_mode": "Markdown"
+                }
+            },
+            "name": "Send Telegram",
+            "type": "n8n-nodes-base.telegram",
+            "typeVersion": 1.1,
+            "position": [
+                1050,
+                200
+            ],
+            "credentials": {
+                "telegramApi": {
+                    "id": "1",
+                    "name": "Telegram API"
+                }
+            },
+            "notes": "Gửi thông báo đến Telegram"
+        },
+        {
+            "parameters": {
+                "values": {
+                    "number": [
+                        {
+                            "name": "count",
+                            "value": "={{ $items().length }}"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "name": "Count Items",
+            "type": "n8n-nodes-base.set",
+            "typeVersion": 3.2,
+            "position": [
+                850,
+                400
+            ]
+        },
+        {
+            "parameters": {
+                "resource": "message",
+                "chatId": "={{$env.TELEGRAM_CHAT_ID}}",
+                "text": "=✅ **Không có khách nào cần gọi hôm nay!**\n\nBạn đã hoàn thành tốt công việc chăm sóc khách hàng. 🎉",
+                "additionalFields": {}
+            },
+            "name": "No Reminders Message",
+            "type": "n8n-nodes-base.telegram",
+            "typeVersion": 1.1,
+            "position": [
+                850,
+                500
+            ],
+            "credentials": {
+                "telegramApi": {
+                    "id": "1",
+                    "name": "Telegram API"
+                }
+            }
+        }
+    ],
+    "connections": {
+        "Schedule Trigger": {
+            "main": [
+                [
+                    {
+                        "node": "Get Due Reminders",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Get Due Reminders": {
+            "main": [
+                [
+                    {
+                        "node": "Has Reminders?",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Has Reminders?": {
+            "main": [
+                [
+                    {
+                        "node": "Split Contacts",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "No Reminders Message",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Split Contacts": {
+            "main": [
+                [
+                    {
+                        "node": "Send Telegram",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    },
+    "settings": {
+        "executionOrder": "v1"
+    },
+    "staticData": null,
+    "tags": [
+        {
+            "name": "CRM"
+        },
+        {
+            "name": "Automation"
+        }
+    ],
+    "triggerCount": 1,
+    "variables": [
+        {
+            "key": "SUPABASE_URL",
+            "value": "https://nkjakqtffuowajsmioff.supabase.co"
+        },
+        {
+            "key": "SUPABASE_ANON_KEY",
+            "value": "YOUR_SUPABASE_ANON_KEY"
+        },
+        {
+            "key": "TELEGRAM_CHAT_ID",
+            "value": "YOUR_TELEGRAM_CHAT_ID"
+        },
+        {
+            "key": "CRM_URL",
+            "value": "https://your-crm-domain.com"
+        }
+    ]
+}
