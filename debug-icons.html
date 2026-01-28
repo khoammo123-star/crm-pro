@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Debug Lucide Icons</title>
+    <style>
+        body {
+            font-family: Arial;
+            padding: 20px;
+            background: #1a1a2e;
+            color: #eee;
+        }
+
+        .card {
+            background: #16213e;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+
+        .success {
+            color: #4ade80;
+        }
+
+        .error {
+            color: #f87171;
+        }
+
+        .icon-test {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            margin: 10px 0;
+        }
+
+        .icon-test i {
+            width: 24px;
+            height: 24px;
+        }
+
+        pre {
+            background: #0f0f23;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>🔍 Debug Lucide Icons</h1>
+
+    <div class="card">
+        <h3>1. Kiểm tra Lucide Library</h3>
+        <div id="lucide-check"></div>
+    </div>
+
+    <div class="card">
+        <h3>2. Test Icons</h3>
+        <div class="icon-test">
+            <span>Menu:</span>
+            <i data-lucide="menu"></i>
+        </div>
+        <div class="icon-test">
+            <span>Search:</span>
+            <i data-lucide="search"></i>
+        </div>
+        <div class="icon-test">
+            <span>Plus:</span>
+            <i data-lucide="plus"></i>
+        </div>
+        <div class="icon-test">
+            <span>Layout Dashboard:</span>
+            <i data-lucide="layout-dashboard"></i>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>3. Console Errors</h3>
+        <pre id="errors">Checking...</pre>
+    </div>
+
+    <!-- Test with LOCAL file -->
+    <script src="js/lucide.min.js"></script>
+
+    <script>
+        const checkDiv = document.getElementById('lucide-check');
+        const errorsDiv = document.getElementById('errors');
+        let errors = [];
+
+        // Capture errors
+        window.onerror = function (msg, url, line) {
+            errors.push(`${msg} at ${url}:${line}`);
+        };
+
+        // Check Lucide
+        if (typeof lucide !== 'undefined') {
+            checkDiv.innerHTML = `
+                <p class="success">✅ lucide object exists</p>
+                <p>Type: ${typeof lucide}</p>
+                <p>Keys: ${Object.keys(lucide).join(', ')}</p>
+                <p>createIcons: ${typeof lucide.createIcons}</p>
+            `;
+
+            // Try to create icons
+            try {
+                lucide.createIcons();
+                checkDiv.innerHTML += '<p class="success">✅ lucide.createIcons() called successfully</p>';
+            } catch (e) {
+                checkDiv.innerHTML += `<p class="error">❌ Error calling createIcons: ${e.message}</p>`;
+                errors.push(e.message);
+            }
+        } else {
+            checkDiv.innerHTML = '<p class="error">❌ lucide is undefined - Library not loaded!</p>';
+            errors.push('lucide is undefined');
+        }
+
+        // Show errors
+        setTimeout(() => {
+            if (errors.length > 0) {
+                errorsDiv.innerHTML = errors.join('\n');
+                errorsDiv.style.color = '#f87171';
+            } else {
+                errorsDiv.innerHTML = 'No errors detected!';
+                errorsDiv.style.color = '#4ade80';
+            }
+        }, 1000);
+    </script>
+</body>
+
+</html>
