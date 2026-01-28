@@ -199,6 +199,11 @@
     gap: var(--spacing-4);
 }
 
+/* Hide mobile settings on desktop */
+.mobile-settings-btn {
+    display: none;
+}
+
 /* === PAGE CONTAINER === */
 .page-container {
     flex: 1;
@@ -269,10 +274,17 @@
     .sidebar {
         transform: translateX(-100%);
         width: var(--sidebar-width);
+        visibility: hidden;
     }
 
     .sidebar.mobile-open {
         transform: translateX(0);
+        visibility: visible;
+    }
+
+    /* Ẩn sidebar-footer khi sidebar không mở */
+    .sidebar:not(.mobile-open) .sidebar-footer {
+        display: none;
     }
 
     .main-content {
@@ -311,6 +323,11 @@
 
     .header-right .btn span {
         display: none;
+    }
+
+    /* Mobile settings button */
+    .mobile-settings-btn {
+        display: flex !important;
     }
 }
 
