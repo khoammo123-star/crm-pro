@@ -221,6 +221,23 @@ const ContactsPage = {
         });
     },
 
+    // View contact in Drawer (side panel)
+    viewContact(id) {
+        if (typeof Drawer !== 'undefined') {
+            Drawer.open(id);
+        } else {
+            // Fallback to edit modal
+            this.openEditModal(id);
+        }
+    },
+
+    // Confirm delete
+    confirmDelete(id) {
+        if (confirm('Bạn có chắc chắn muốn xóa liên hệ này?')) {
+            this.deleteContact(id);
+        }
+    },
+
     openCreateModal() {
         const content = this.renderContactForm();
 

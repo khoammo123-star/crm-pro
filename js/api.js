@@ -463,5 +463,69 @@ const API = {
     // Webhook để n8n gọi vào CRM
     async triggerWebhook(event, payload) {
         return this.request('webhook', { event, payload });
+    },
+
+    // ===== SINGLE CONTACT =====
+    async getContact(id) {
+        const backend = this.getBackend();
+        if (backend) return backend.getContact(id);
+        return this.request('getContact', { id }, 'GET');
+    },
+
+    // ===== APPOINTMENTS (Lịch hẹn) =====
+    async getAppointments(contactId) {
+        const backend = this.getBackend();
+        if (backend) return backend.getAppointments(contactId);
+        return this.request('getAppointments', { contact_id: contactId }, 'GET');
+    },
+
+    async createAppointment(data) {
+        const backend = this.getBackend();
+        if (backend) return backend.createAppointment(data);
+        return this.request('createAppointment', data);
+    },
+
+    async updateAppointment(id, data) {
+        const backend = this.getBackend();
+        if (backend) return backend.updateAppointment(id, data);
+        return this.request('updateAppointment', { id, ...data });
+    },
+
+    async deleteAppointment(id) {
+        const backend = this.getBackend();
+        if (backend) return backend.deleteAppointment(id);
+        return this.request('deleteAppointment', { id });
+    },
+
+    // ===== REMINDERS (Nhắc nhở) =====
+    async getReminders(contactId) {
+        const backend = this.getBackend();
+        if (backend) return backend.getReminders(contactId);
+        return this.request('getReminders', { contact_id: contactId }, 'GET');
+    },
+
+    async createReminder(data) {
+        const backend = this.getBackend();
+        if (backend) return backend.createReminder(data);
+        return this.request('createReminder', data);
+    },
+
+    async updateReminder(id, data) {
+        const backend = this.getBackend();
+        if (backend) return backend.updateReminder(id, data);
+        return this.request('updateReminder', { id, ...data });
+    },
+
+    async deleteReminder(id) {
+        const backend = this.getBackend();
+        if (backend) return backend.deleteReminder(id);
+        return this.request('deleteReminder', { id });
+    },
+
+    // ===== ACTIVITIES (Timeline) =====
+    async getActivities(contactId, limit = 50) {
+        const backend = this.getBackend();
+        if (backend) return backend.getActivities(contactId, limit);
+        return this.request('getActivities', { contact_id: contactId, limit }, 'GET');
     }
 };

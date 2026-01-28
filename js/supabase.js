@@ -425,6 +425,94 @@ const SupabaseAPI = {
         } catch (e) {
             console.warn('[Supabase] Activity log failed:', e);
         }
+    },
+
+    // ===== APPOINTMENTS (Lịch hẹn) =====
+    async getAppointments(contactId) {
+        const appointments = await this.request(
+            `appointments?contact_id=eq.${contactId}&order=start_time.asc`
+        );
+        return appointments || [];
+    },
+
+    async createAppointment(data) {
+        const appointment = await this.request('appointments', {
+            method: 'POST',
+            body: data
+        });
+        // Log activity
+        await this.logActivity('appointment', `Đặt lịch hẹn: ${data.title}`, 'contact', data.contact_id);
+        return { success: true, data: appointment[0] };
+    },
+
+    async updateAppointment(id, data) {
+        const appointment = await this.request(`appointments?id=eq.${id}`, {
+            method: 'PATCH',
+            body: data
+        });
+        return { success: true, data: appointment[0] };
+    },
+
+    async deleteAppointment(id) {
+        await this.request(`appointments?id=eq.${id}`, { method: 'DELETE' });
+        return { success: true };
+    },
+
+    // ===== REMINDERS (Nhắc nhở) =====
+    async getReminders(contactId) {
+        const reminders = await this.request(
+            `reminders?contact_id=eq.${contactId}&order=remind_at.asc`
+        );
+        return reminders || [];
+    },
+
+    async createReminder(data) {
+        const reminder = await this.request('reminders', {
+            method: 'POST',
+            body: data
+        });
+        await this.logActivity('reminder', `Thêm nhắc nhở: ${data.title}`, 'contact', data.contact_id);
+        return { success: true, data: reminder[0] };
+    },
+
+    async updateReminder(id, data) {
+        const reminder = await this.request(`reminders?id=eq.${id}`, {
+            method: 'PATCH',
+            body: data
+        });
+        return { success: true, data: reminder[0] };
+    },
+
+    async deleteReminder(id) {
+        await this.request(`reminders?id=eq.${id}`, { method: 'DELETE' });
+        return { success: true };
+    },
+
+    // ===== CONTACT ACTIVITIES (Timeline) =====
+    async getActivities(contactId, limit = 50) {
+        // Get activities related to this contact
+        const activities = await this.request(
+            `activities?entity_type=eq.contact&entity_id=eq.${contactId}&order=created_at.desc&limit=${limit}`
+        );
+        return activities || [];
+    },
+
+    // ===== UPCOMING APPOINTMENTS (Dashboard) =====
+    async getUpcomingAppointments(limit = 5) {
+        const now = new Date().toISOString();
+        const appointments = await this.request(
+            `appointments?start_time=gte.${now}&status=eq.scheduled&order=start_time.asc&limit=${limit}&select=*,contact:contacts(id,first_name,last_name)`
+        );
+        return { success: true, data: appointments || [] };
+    },
+
+    // ===== PENDING REMINDERS =====
+    async getPendingReminders(limit = 10) {
+        const now = new Date().toISOString();
+        const reminders = await this.request(
+            `reminders?remind_at=lte.${now}&is_done=eq.false&order=remind_at.asc&limit=${limit}&select=*,contact:contacts(id,first_name,last_name)`
+        );
+        return { success: true, data: reminders || [] };
     }
 };
 
