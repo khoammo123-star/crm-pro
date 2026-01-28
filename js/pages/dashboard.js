@@ -4,25 +4,25 @@
 
 const DashboardPage = {
 
-    async render() {
-        const container = document.getElementById('dashboardPage');
+  async render() {
+    const container = document.getElementById('dashboardPage');
 
-        if (!AppConfig.isConfigured()) {
-            container.innerHTML = this.renderSetupGuide();
-            return;
-        }
+    if (!AppConfig.isConfigured()) {
+      container.innerHTML = this.renderSetupGuide();
+      return;
+    }
 
-        container.innerHTML = '<div class="loading-spinner"></div>';
+    container.innerHTML = '<div class="loading-spinner"></div>';
 
-        try {
-            const result = await API.getDashboardStats();
-            const stats = result.data;
+    try {
+      const result = await API.getDashboardStats();
+      const stats = result.data;
 
-            container.innerHTML = this.renderDashboard(stats);
-            this.initCharts(stats);
+      container.innerHTML = this.renderDashboard(stats);
+      this.initCharts(stats);
 
-        } catch (error) {
-            container.innerHTML = `
+    } catch (error) {
+      container.innerHTML = `
         <div class="empty-state">
           <div class="empty-state-icon">⚠️</div>
           <div class="empty-state-title">Không thể tải dữ liệu</div>
@@ -30,11 +30,11 @@ const DashboardPage = {
           <button class="btn btn-primary" onclick="DashboardPage.render()">Thử lại</button>
         </div>
       `;
-        }
-    },
+    }
+  },
 
-    renderSetupGuide() {
-        return `
+  renderSetupGuide() {
+    return `
       <div class="card" style="max-width: 600px; margin: 40px auto;">
         <div class="card-header">
           <h2 class="card-title">🚀 Chào mừng đến CRM Pro!</h2>
@@ -77,52 +77,73 @@ const DashboardPage = {
         </div>
       </div>
     `;
-    },
+  },
 
-    async saveApiUrl() {
-        const input = document.getElementById('setupApiUrl');
-        const url = input.value.trim();
+  async saveApiUrl() {
+    const input = document.getElementById('setupApiUrl');
+    const url = input.value.trim();
 
-        if (!url) {
-            Components.toast('Vui lòng nhập URL', 'error');
-            return;
-        }
+    if (!url) {
+      Components.toast('Vui lòng nhập URL', 'error');
+      return;
+    }
 
-        Components.showLoading('Đang kết nối...');
+    Components.showLoading('Đang kết nối...');
 
-        try {
-            AppConfig.setApiUrl(url);
+    try {
+      AppConfig.setApiUrl(url);
 
-            // Test connection
-            await API.testConnection();
+      // Test connection
+      await API.testConnection();
 
-            // Initialize database
-            await API.initializeDatabase();
+      // Initialize database
+      await API.initializeDatabase();
 
-            // Load config
-            const configResult = await API.getConfig();
-            Object.assign(AppData, configResult.data, { loaded: true });
+      // Load config
+      const configResult = await API.getConfig();
+      Object.assign(AppData, configResult.data, { loaded: true });
 
-            Components.hideLoading();
-            Components.toast('Kết nối thành công!', 'success');
+      Components.hideLoading();
+      Components.toast('Kết nối thành công!', 'success');
 
-            this.render();
+      this.render();
 
-        } catch (error) {
-            Components.hideLoading();
-            Components.toast('Kết nối thất bại: ' + error.message, 'error');
-            AppConfig.setApiUrl('');
-        }
-    },
+    } catch (error) {
+      Components.hideLoading();
+      Components.toast('Kết nối thất bại: ' + error.message, 'error');
+      AppConfig.setApiUrl('');
+    }
+  },
 
-    renderDashboard(stats) {
-        return `
+  renderDashboard(stats) {
+    // Get reminder counts (async, will update after)
+    this.loadReminderCounts();
+
+    return `
       <!-- Stats Cards -->
       <div class="stats-grid">
         ${Components.statCard('👥', 'Liên hệ', stats.contacts.total, null, 'blue')}
         ${Components.statCard('🏢', 'Công ty', stats.companies.total, null, 'purple')}
         ${Components.statCard('💰', 'Deals đang mở', stats.deals.active, null, 'green')}
         ${Components.statCard('✅', 'Tasks hôm nay', stats.tasks.dueToday, null, 'orange')}
+      </div>
+      
+      <!-- Reminder Cards (new) -->
+      <div class="stats-grid mt-4">
+        <div class="stat-card clickable" onclick="App.navigateTo('contacts')" id="dueRemindersCard">
+          <div class="stat-icon" style="background: linear-gradient(135deg, #ef4444 20%, #f87171 100%); color: white;">🔔</div>
+          <div class="stat-content">
+            <div class="stat-label">Cần gọi hôm nay</div>
+            <div class="stat-value" id="dueRemindersCount">--</div>
+          </div>
+        </div>
+        <div class="stat-card clickable" onclick="App.navigateTo('contacts')" id="upcomingNeedsCard">
+          <div class="stat-icon" style="background: linear-gradient(135deg, #f59e0b 20%, #fbbf24 100%); color: white;">📦</div>
+          <div class="stat-content">
+            <div class="stat-label">Sắp cần SP (7 ngày)</div>
+            <div class="stat-value" id="upcomingNeedsCount">--</div>
+          </div>
+        </div>
       </div>
       
       <!-- Charts -->
@@ -197,14 +218,14 @@ const DashboardPage = {
         </div>
       </div>
     `;
-    },
+  },
 
-    renderTopDeals(deals) {
-        if (!deals || deals.length === 0) {
-            return '<p class="text-secondary text-center">Chưa có deal nào</p>';
-        }
+  renderTopDeals(deals) {
+    if (!deals || deals.length === 0) {
+      return '<p class="text-secondary text-center">Chưa có deal nào</p>';
+    }
 
-        return deals.map(deal => `
+    return deals.map(deal => `
       <div class="activity-item" style="cursor: pointer" onclick="App.navigateTo('deals', '${deal.id}')">
         <div class="activity-icon" style="background: ${deal.stageInfo?.color || '#3b82f6'}20; color: ${deal.stageInfo?.color || '#3b82f6'}">
           💰
@@ -216,14 +237,14 @@ const DashboardPage = {
         ${Components.badge(deal.stageInfo?.name || deal.stage, Utils.getStatusBadgeClass(deal.stage).replace('badge-', ''))}
       </div>
     `).join('');
-    },
+  },
 
-    renderRecentContacts(contacts) {
-        if (!contacts || contacts.length === 0) {
-            return '<p class="text-secondary text-center">Chưa có liên hệ nào</p>';
-        }
+  renderRecentContacts(contacts) {
+    if (!contacts || contacts.length === 0) {
+      return '<p class="text-secondary text-center">Chưa có liên hệ nào</p>';
+    }
 
-        return contacts.map(contact => `
+    return contacts.map(contact => `
       <div class="activity-item" style="cursor: pointer" onclick="App.navigateTo('contacts', '${contact.id}')">
         ${Components.avatar(contact.name.split(' ')[0], contact.name.split(' ').slice(1).join(' '), 'sm')}
         <div class="activity-content">
@@ -233,66 +254,96 @@ const DashboardPage = {
         ${Components.statusBadge(contact.status, 'contact')}
       </div>
     `).join('');
-    },
+  },
 
-    initCharts(stats) {
-        // Revenue Chart
-        const revenueCtx = document.getElementById('revenueChart');
-        if (revenueCtx && stats.monthlyRevenue) {
-            new Chart(revenueCtx, {
-                type: 'bar',
-                data: {
-                    labels: stats.monthlyRevenue.map(m => m.month),
-                    datasets: [{
-                        label: 'Doanh thu',
-                        data: stats.monthlyRevenue.map(m => m.value),
-                        backgroundColor: 'rgba(59, 130, 246, 0.8)',
-                        borderRadius: 6
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                callback: value => Utils.formatCurrency(value)
-                            }
-                        }
-                    }
-                }
-            });
+  initCharts(stats) {
+    // Revenue Chart
+    const revenueCtx = document.getElementById('revenueChart');
+    if (revenueCtx && stats.monthlyRevenue) {
+      new Chart(revenueCtx, {
+        type: 'bar',
+        data: {
+          labels: stats.monthlyRevenue.map(m => m.month),
+          datasets: [{
+            label: 'Doanh thu',
+            data: stats.monthlyRevenue.map(m => m.value),
+            backgroundColor: 'rgba(59, 130, 246, 0.8)',
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                callback: value => Utils.formatCurrency(value)
+              }
+            }
+          }
         }
-
-        // Pipeline Chart
-        const pipelineCtx = document.getElementById('pipelineChart');
-        if (pipelineCtx && stats.pipeline) {
-            const activeStages = stats.pipeline.filter(s => !['won', 'lost'].includes(s.id));
-
-            new Chart(pipelineCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: activeStages.map(s => s.name),
-                    datasets: [{
-                        data: activeStages.map(s => s.count),
-                        backgroundColor: activeStages.map(s => s.color),
-                        borderWidth: 0
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom'
-                        }
-                    }
-                }
-            });
-        }
+      });
     }
+
+    // Pipeline Chart
+    const pipelineCtx = document.getElementById('pipelineChart');
+    if (pipelineCtx && stats.pipeline) {
+      const activeStages = stats.pipeline.filter(s => !['won', 'lost'].includes(s.id));
+
+      new Chart(pipelineCtx, {
+        type: 'doughnut',
+        data: {
+          labels: activeStages.map(s => s.name),
+          datasets: [{
+            data: activeStages.map(s => s.count),
+            backgroundColor: activeStages.map(s => s.color),
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom'
+            }
+          }
+        }
+      });
+    }
+  },
+
+  // Load reminder counts from RPC functions
+  async loadReminderCounts() {
+    try {
+      const backend = API.getBackend();
+      if (!backend) return;
+
+      // Parallel calls for performance
+      const [dueResult, upcomingResult] = await Promise.all([
+        backend.countDueReminders(),
+        backend.countUpcomingNeeds(7)
+      ]);
+
+      // Update UI
+      const dueEl = document.getElementById('dueRemindersCount');
+      const upcomingEl = document.getElementById('upcomingNeedsCount');
+
+      if (dueEl) {
+        dueEl.textContent = dueResult.count || 0;
+        if (dueResult.count > 0) {
+          dueEl.classList.add('text-danger');
+        }
+      }
+      if (upcomingEl) {
+        upcomingEl.textContent = upcomingResult.count || 0;
+      }
+    } catch (error) {
+      console.error('[Dashboard] loadReminderCounts error:', error);
+    }
+  }
 };

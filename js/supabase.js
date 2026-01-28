@@ -513,6 +513,66 @@ const SupabaseAPI = {
             `reminders?remind_at=lte.${now}&is_done=eq.false&order=remind_at.asc&limit=${limit}&select=*,contact:contacts(id,first_name,last_name)`
         );
         return { success: true, data: reminders || [] };
+    },
+
+    // ===== N8N INTEGRATION RPC FUNCTIONS =====
+
+    // Lấy danh sách khách cần gọi hôm nay (dùng RPC)
+    async getDueReminders() {
+        try {
+            const data = await this.rpc('get_due_reminders');
+            return { success: true, data: data || [] };
+        } catch (error) {
+            console.error('[Supabase] getDueReminders error:', error);
+            return { success: false, error: error.message, data: [] };
+        }
+    },
+
+    // Lấy khách sắp cần SP trong N ngày tới
+    async getUpcomingNeeds(daysAhead = 7) {
+        try {
+            const data = await this.rpc('get_upcoming_needs', { days_ahead: daysAhead });
+            return { success: true, data: data || [] };
+        } catch (error) {
+            console.error('[Supabase] getUpcomingNeeds error:', error);
+            return { success: false, error: error.message, data: [] };
+        }
+    },
+
+    // Đếm số khách cần gọi hôm nay
+    async countDueReminders() {
+        try {
+            const data = await this.rpc('count_due_reminders');
+            return { success: true, count: data || 0 };
+        } catch (error) {
+            console.error('[Supabase] countDueReminders error:', error);
+            return { success: false, count: 0 };
+        }
+    },
+
+    // Đếm khách sắp cần SP
+    async countUpcomingNeeds(daysAhead = 7) {
+        try {
+            const data = await this.rpc('count_upcoming_needs', { days_ahead: daysAhead });
+            return { success: true, count: data || 0 };
+        } catch (error) {
+            console.error('[Supabase] countUpcomingNeeds error:', error);
+            return { success: false, count: 0 };
+        }
+    },
+
+    // Đánh dấu đã liên hệ
+    async markContacted(contactId, nextReminderDate = null) {
+        try {
+            await this.rpc('mark_contacted', {
+                contact_id: contactId,
+                next_reminder: nextReminderDate
+            });
+            return { success: true };
+        } catch (error) {
+            console.error('[Supabase] markContacted error:', error);
+            return { success: false, error: error.message };
+        }
     }
 };
 
