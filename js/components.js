@@ -328,6 +328,20 @@ const Components = {
 };
 
 // Global functions for onclick handlers
+function openSettingsModal() {
+    const overlay = document.getElementById('settingsOverlay');
+    overlay.style.display = 'flex';
+
+    // Load current settings
+    document.getElementById('apiUrlInput').value = AppConfig.getApiUrl() || '';
+    document.getElementById('themeSelect').value = localStorage.getItem(AppConfig.STORAGE_KEYS.THEME) || 'dark';
+
+    // Re-render icons
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+}
+
 function closeSettingsModal() {
     document.getElementById('settingsOverlay').style.display = 'none';
 }
