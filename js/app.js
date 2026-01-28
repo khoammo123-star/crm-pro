@@ -125,10 +125,18 @@ const App = {
             document.getElementById('themeSelect').value = newTheme;
         });
 
-        // Settings button
+        // Settings button (desktop - in sidebar)
         document.getElementById('settingsBtn').addEventListener('click', () => {
             this.showDatabaseSettings();
         });
+
+        // Settings button (mobile - in header)
+        const mobileSettingsBtn = document.getElementById('mobileSettingsBtn');
+        if (mobileSettingsBtn) {
+            mobileSettingsBtn.addEventListener('click', () => {
+                this.showDatabaseSettings();
+            });
+        }
 
         // Close settings on overlay click
         document.getElementById('settingsOverlay').addEventListener('click', (e) => {
