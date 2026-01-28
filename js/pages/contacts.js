@@ -68,8 +68,9 @@ const ContactsPage = {
                 <th>Công ty</th>
                 <th>Điện thoại</th>
                 <th>Trạng thái</th>
-                <th>Nguồn</th>
-                <th>Ngày tạo</th>
+                <th>Ưu tiên</th>
+                <th>Nhắc gọi</th>
+                <th>Cần SP</th>
                 <th></th>
               </tr>
             </thead>
@@ -109,8 +110,30 @@ const ContactsPage = {
     const company = contact.company;
     const zaloPhone = contact.zalo_phone || contact.phone;
 
+    // Priority badge colors
+    const priorityColors = {
+      urgent: 'badge-danger',
+      high: 'badge-warning',
+      normal: 'badge-primary',
+      low: 'badge-gray'
+    };
+    const priorityLabels = {
+      urgent: '🔥 Khẩn',
+      high: '⚡ Cao',
+      normal: '📋 Thường',
+      low: '📌 Thấp'
+    };
+
+    // Check if reminder is due (today or past)
+    const reminderDate = contact.reminder_date;
+    const isReminderDue = reminderDate && new Date(reminderDate) <= new Date();
+
+    // Check if expected need date is coming soon (within 7 days)
+    const needDate = contact.expected_need_date;
+    const isNeedSoon = needDate && ((new Date(needDate) - new Date()) / (1000 * 60 * 60 * 24)) <= 7;
+
     return `
-      <tr>
+      <tr class="${isReminderDue ? 'row-highlight-warning' : ''}">
         <td>
           <div class="contact-row">
             ${Components.avatar(contact.first_name, contact.last_name)}
@@ -123,12 +146,27 @@ const ContactsPage = {
         <td>${company ? company.name : '-'}</td>
         <td>${contact.phone || '-'}</td>
         <td>${Components.statusBadge(contact.status, 'contact')}</td>
-        <td>${contact.source || '-'}</td>
-        <td>${Utils.formatDate(contact.created_at)}</td>
+        <td>
+          ${contact.care_priority ? `<span class="badge ${priorityColors[contact.care_priority] || 'badge-gray'}">${priorityLabels[contact.care_priority] || contact.care_priority}</span>` : '-'}
+        </td>
+        <td>
+          ${reminderDate ? `
+            <span class="${isReminderDue ? 'text-danger font-semibold' : ''}" title="${contact.reminder_note || ''}">
+              ${isReminderDue ? '🔔 ' : ''}${Utils.formatDate(reminderDate)}
+            </span>
+          ` : '-'}
+        </td>
+        <td>
+          ${needDate ? `
+            <span class="${isNeedSoon ? 'text-warning font-semibold' : ''}">
+              ${isNeedSoon ? '📦 ' : ''}${Utils.formatDate(needDate)}
+            </span>
+          ` : '-'}
+        </td>
         <td>
           <div class="table-actions">
             ${zaloPhone ? `
-              <a href="https://zalo.me/${zaloPhone.replace(/\D/g, '')}" target="_blank" class="btn-icon btn-zalo" title="Chat Zalo" onclick="event.stopPropagation()">
+              <a href="https://zalo.me/${zaloPhone.replace(/\\D/g, '')}" target="_blank" class="btn-icon btn-zalo" title="Chat Zalo" onclick="event.stopPropagation()">
                 <img src="icons/zalo.svg" width="18" height="18" alt="Zalo">
               </a>
             ` : ''}
@@ -153,8 +191,22 @@ const ContactsPage = {
     const fullName = Utils.getFullName(contact.first_name, contact.last_name);
     const zaloPhone = contact.zalo_phone || contact.phone;
 
+    // Priority labels
+    const priorityLabels = {
+      urgent: '🔥 Khẩn cấp',
+      high: '⚡ Cao',
+      normal: '📋 Thường',
+      low: '📌 Thấp'
+    };
+
+    // Check dates
+    const reminderDate = contact.reminder_date;
+    const isReminderDue = reminderDate && new Date(reminderDate) <= new Date();
+    const needDate = contact.expected_need_date;
+    const isNeedSoon = needDate && ((new Date(needDate) - new Date()) / (1000 * 60 * 60 * 24)) <= 7;
+
     return `
-      <div class="mobile-card" onclick="ContactsPage.viewContact('${contact.id}')">
+      <div class="mobile-card ${isReminderDue ? 'card-highlight-warning' : ''}" onclick="ContactsPage.viewContact('${contact.id}')">
         <div class="mobile-card-header">
           <div style="display: flex; align-items: center; gap: 12px;">
             ${Components.avatar(contact.first_name, contact.last_name)}
@@ -167,6 +219,24 @@ const ContactsPage = {
         </div>
         
         <div class="mobile-card-body">
+          ${contact.care_priority && contact.care_priority !== 'normal' ? `
+            <div class="mobile-card-row">
+              <span class="mobile-card-label">⚡ Ưu tiên</span>
+              <span class="mobile-card-value ${contact.care_priority === 'urgent' ? 'text-danger' : contact.care_priority === 'high' ? 'text-warning' : ''}">${priorityLabels[contact.care_priority] || contact.care_priority}</span>
+            </div>
+          ` : ''}
+          ${reminderDate ? `
+            <div class="mobile-card-row">
+              <span class="mobile-card-label">🔔 Nhắc gọi</span>
+              <span class="mobile-card-value ${isReminderDue ? 'text-danger font-bold' : ''}">${isReminderDue ? '⏰ HÔM NAY - ' : ''}${Utils.formatDate(reminderDate)}</span>
+            </div>
+          ` : ''}
+          ${needDate ? `
+            <div class="mobile-card-row">
+              <span class="mobile-card-label">📦 Cần SP</span>
+              <span class="mobile-card-value ${isNeedSoon ? 'text-warning' : ''}">${isNeedSoon ? '⏳ ' : ''}${Utils.formatDate(needDate)}</span>
+            </div>
+          ` : ''}
           ${company ? `
             <div class="mobile-card-row">
               <span class="mobile-card-label">🏢 Công ty</span>
@@ -175,20 +245,10 @@ const ContactsPage = {
           ` : ''}
           ${contact.phone ? `
             <div class="mobile-card-row">
-              <span class="mobile-card-label">📞 Điện thoại</span>
+              <span class="mobile-card-label">📞 SĐT</span>
               <span class="mobile-card-value">${contact.phone}</span>
             </div>
           ` : ''}
-          ${contact.reminder_date ? `
-            <div class="mobile-card-row">
-              <span class="mobile-card-label">🔔 Nhắc gọi</span>
-              <span class="mobile-card-value">${Utils.formatDate(contact.reminder_date)}</span>
-            </div>
-          ` : ''}
-          <div class="mobile-card-row">
-            <span class="mobile-card-label">📅 Ngày tạo</span>
-            <span class="mobile-card-value">${Utils.formatDate(contact.created_at)}</span>
-          </div>
         </div>
         
         <div class="mobile-card-actions" onclick="event.stopPropagation()">

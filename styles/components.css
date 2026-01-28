@@ -375,6 +375,38 @@
     gap: var(--spacing-1);
 }
 
+/* Row/Card highlights for reminders */
+.row-highlight-warning {
+    background-color: rgba(245, 158, 11, 0.1) !important;
+    border-left: 3px solid var(--warning-500);
+}
+
+.card-highlight-warning {
+    border-left: 4px solid var(--warning-500);
+    background: linear-gradient(90deg, rgba(245, 158, 11, 0.08) 0%, transparent 30%);
+}
+
+/* Text utilities */
+.text-danger {
+    color: var(--danger-600) !important;
+}
+
+.text-warning {
+    color: var(--warning-600) !important;
+}
+
+.text-success {
+    color: var(--success-600) !important;
+}
+
+.font-semibold {
+    font-weight: var(--font-weight-semibold) !important;
+}
+
+.font-bold {
+    font-weight: var(--font-weight-bold) !important;
+}
+
 /* === BADGES === */
 .badge {
     display: inline-flex;
