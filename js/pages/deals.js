@@ -39,7 +39,7 @@ const DealsPage = {
         </div>
         
         <button class="btn btn-primary desktop-only" onclick="DealsPage.openCreateModal()">
-          <i class="lucide-plus"></i> Thêm deal
+          <i data-lucide="plus"></i> Thêm deal
         </button>
       </div>
       
@@ -167,10 +167,10 @@ const DealsPage = {
         
         <div class="mobile-card-actions" onclick="event.stopPropagation()">
           <button class="btn btn-sm btn-secondary" onclick="DealsPage.viewDeal('${deal.id}')">
-            <i class="lucide-eye"></i> Xem
+            <i data-lucide="eye"></i> Xem
           </button>
           <button class="btn btn-sm btn-secondary" onclick="DealsPage.openEditModal('${deal.id}')">
-            <i class="lucide-edit"></i> Sửa
+            <i data-lucide="edit"></i> Sửa
           </button>
         </div>
       </div>
@@ -410,10 +410,10 @@ const DealsPage = {
         
         <div style="display: flex; gap: 12px; margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border-color-light);">
           <button class="btn btn-secondary" onclick="DealsPage.openEditModal('${id}'); Components.closeModal();">
-            <i class="lucide-edit"></i> Sửa
+            <i data-lucide="edit"></i> Sửa
           </button>
           <button class="btn btn-danger" onclick="DealsPage.deleteDeal('${id}'); Components.closeModal();">
-            <i class="lucide-trash-2"></i> Xóa
+            <i data-lucide="trash-2"></i> Xóa
           </button>
         </div>
       `;

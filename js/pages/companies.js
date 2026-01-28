@@ -3,44 +3,44 @@
 // =====================================================
 
 const CompaniesPage = {
-    currentPage: 1,
-    currentFilters: {},
+  currentPage: 1,
+  currentFilters: {},
 
-    async render() {
-        const container = document.getElementById('companiesPage');
-        container.innerHTML = '<div class="loading-spinner" style="margin: 40px auto;"></div>';
+  async render() {
+    const container = document.getElementById('companiesPage');
+    container.innerHTML = '<div class="loading-spinner" style="margin: 40px auto;"></div>';
 
-        try {
-            await this.loadCompanies();
-        } catch (error) {
-            container.innerHTML = Components.emptyState(
-                '⚠️',
-                'Không thể tải dữ liệu',
-                error.message,
-                'Thử lại',
-                'CompaniesPage.render()'
-            );
-        }
-    },
+    try {
+      await this.loadCompanies();
+    } catch (error) {
+      container.innerHTML = Components.emptyState(
+        '⚠️',
+        'Không thể tải dữ liệu',
+        error.message,
+        'Thử lại',
+        'CompaniesPage.render()'
+      );
+    }
+  },
 
-    async loadCompanies() {
-        const container = document.getElementById('companiesPage');
+  async loadCompanies() {
+    const container = document.getElementById('companiesPage');
 
-        const params = {
-            page: this.currentPage,
-            limit: 20,
-            ...this.currentFilters
-        };
+    const params = {
+      page: this.currentPage,
+      limit: 20,
+      ...this.currentFilters
+    };
 
-        const result = await API.getCompanies(params);
-        const { data: companies, pagination } = result;
+    const result = await API.getCompanies(params);
+    const { data: companies, pagination } = result;
 
-        container.innerHTML = `
+    container.innerHTML = `
       <!-- Toolbar -->
       <div class="list-toolbar">
         <div class="filter-group">
           <div class="search-box">
-            <i class="lucide-search"></i>
+            <i data-lucide="search"></i>
             <input type="text" id="companySearch" placeholder="Tìm công ty..." value="${this.currentFilters.search || ''}">
           </div>
           
@@ -53,7 +53,7 @@ const CompaniesPage = {
         </div>
         
         <button class="btn btn-primary" onclick="CompaniesPage.openCreateModal()">
-          <i class="lucide-plus"></i> Thêm công ty
+          <i data-lucide="plus"></i> Thêm công ty
         </button>
       </div>
       
@@ -69,11 +69,11 @@ const CompaniesPage = {
       ${companies.length > 0 ? Components.pagination(pagination.page, pagination.totalPages) : ''}
     `;
 
-        this.initEventListeners();
-    },
+    this.initEventListeners();
+  },
 
-    renderCompanyCard(company) {
-        return `
+  renderCompanyCard(company) {
+    return `
       <div class="card" style="cursor: pointer" onclick="CompaniesPage.viewCompany('${company.id}')">
         <div class="card-body">
           <div style="display: flex; align-items: start; gap: 12px; margin-bottom: 16px;">
@@ -104,99 +104,99 @@ const CompaniesPage = {
         </div>
       </div>
     `;
-    },
+  },
 
-    initEventListeners() {
-        // Search
-        const searchInput = document.getElementById('companySearch');
-        if (searchInput) {
-            searchInput.addEventListener('input', Utils.debounce((e) => {
-                this.currentFilters.search = e.target.value;
-                this.currentPage = 1;
-                this.loadCompanies();
-            }, 500));
+  initEventListeners() {
+    // Search
+    const searchInput = document.getElementById('companySearch');
+    if (searchInput) {
+      searchInput.addEventListener('input', Utils.debounce((e) => {
+        this.currentFilters.search = e.target.value;
+        this.currentPage = 1;
+        this.loadCompanies();
+      }, 500));
+    }
+
+    // Status filter
+    const statusFilter = document.getElementById('companyStatusFilter');
+    if (statusFilter) {
+      statusFilter.addEventListener('change', (e) => {
+        this.currentFilters.status = e.target.value;
+        this.currentPage = 1;
+        this.loadCompanies();
+      });
+    }
+
+    // Pagination
+    document.querySelectorAll('.pagination-btn[data-page]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const page = parseInt(btn.dataset.page);
+        if (page && !btn.disabled) {
+          this.currentPage = page;
+          this.loadCompanies();
         }
+      });
+    });
+  },
 
-        // Status filter
-        const statusFilter = document.getElementById('companyStatusFilter');
-        if (statusFilter) {
-            statusFilter.addEventListener('change', (e) => {
-                this.currentFilters.status = e.target.value;
-                this.currentPage = 1;
-                this.loadCompanies();
-            });
-        }
+  openCreateModal() {
+    const content = this.renderCompanyForm();
 
-        // Pagination
-        document.querySelectorAll('.pagination-btn[data-page]').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const page = parseInt(btn.dataset.page);
-                if (page && !btn.disabled) {
-                    this.currentPage = page;
-                    this.loadCompanies();
-                }
-            });
-        });
-    },
+    Components.openModal('Thêm công ty mới', content, {
+      confirmText: 'Tạo công ty',
+      onConfirm: () => this.createCompany()
+    });
+  },
 
-    openCreateModal() {
-        const content = this.renderCompanyForm();
+  async openEditModal(id) {
+    Components.showLoading();
 
-        Components.openModal('Thêm công ty mới', content, {
-            confirmText: 'Tạo công ty',
-            onConfirm: () => this.createCompany()
-        });
-    },
+    try {
+      const result = await API.getCompany(id);
+      const company = result.data;
 
-    async openEditModal(id) {
-        Components.showLoading();
+      Components.hideLoading();
 
-        try {
-            const result = await API.getCompany(id);
-            const company = result.data;
+      const content = this.renderCompanyForm(company);
 
-            Components.hideLoading();
+      Components.openModal('Sửa công ty', content, {
+        confirmText: 'Lưu thay đổi',
+        onConfirm: () => this.updateCompany(id)
+      });
 
-            const content = this.renderCompanyForm(company);
+    } catch (error) {
+      Components.hideLoading();
+      Components.toast(error.message, 'error');
+    }
+  },
 
-            Components.openModal('Sửa công ty', content, {
-                confirmText: 'Lưu thay đổi',
-                onConfirm: () => this.updateCompany(id)
-            });
+  renderCompanyForm(company = {}) {
+    const industries = AppData.industries || [
+      'Công nghệ', 'Tài chính - Ngân hàng', 'Bất động sản',
+      'Giáo dục', 'Y tế - Sức khỏe', 'Bán lẻ', 'Sản xuất', 'Dịch vụ', 'Khác'
+    ];
 
-        } catch (error) {
-            Components.hideLoading();
-            Components.toast(error.message, 'error');
-        }
-    },
+    const sizes = [
+      { value: '1-10', label: '1-10 nhân viên' },
+      { value: '11-50', label: '11-50 nhân viên' },
+      { value: '51-200', label: '51-200 nhân viên' },
+      { value: '201-500', label: '201-500 nhân viên' },
+      { value: '500+', label: 'Trên 500 nhân viên' }
+    ];
 
-    renderCompanyForm(company = {}) {
-        const industries = AppData.industries || [
-            'Công nghệ', 'Tài chính - Ngân hàng', 'Bất động sản',
-            'Giáo dục', 'Y tế - Sức khỏe', 'Bán lẻ', 'Sản xuất', 'Dịch vụ', 'Khác'
-        ];
-
-        const sizes = [
-            { value: '1-10', label: '1-10 nhân viên' },
-            { value: '11-50', label: '11-50 nhân viên' },
-            { value: '51-200', label: '51-200 nhân viên' },
-            { value: '201-500', label: '201-500 nhân viên' },
-            { value: '500+', label: 'Trên 500 nhân viên' }
-        ];
-
-        return `
+    return `
       <form id="companyForm">
         ${Components.formField('name', 'Tên công ty', 'text', { value: company.name, required: true, placeholder: 'Nhập tên công ty' })}
         
         <div class="form-row">
           ${Components.formField('industry', 'Ngành nghề', 'select', {
-            value: company.industry,
-            options: [{ value: '', label: '-- Chọn ngành --' }, ...industries.map(i => ({ value: i, label: i }))]
-        })}
+      value: company.industry,
+      options: [{ value: '', label: '-- Chọn ngành --' }, ...industries.map(i => ({ value: i, label: i }))]
+    })}
           ${Components.formField('size', 'Quy mô', 'select', {
-            value: company.size,
-            options: [{ value: '', label: '-- Chọn quy mô --' }, ...sizes]
-        })}
+      value: company.size,
+      options: [{ value: '', label: '-- Chọn quy mô --' }, ...sizes]
+    })}
         </div>
         
         <div class="form-row">
@@ -211,96 +211,96 @@ const CompaniesPage = {
         ${Components.formField('description', 'Mô tả', 'textarea', { value: company.description })}
         
         ${Components.formField('status', 'Trạng thái', 'select', {
-            value: company.status || 'active',
-            options: [
-                { value: 'active', label: 'Hoạt động' },
-                { value: 'potential', label: 'Tiềm năng' },
-                { value: 'inactive', label: 'Không hoạt động' }
-            ]
-        })}
+      value: company.status || 'active',
+      options: [
+        { value: 'active', label: 'Hoạt động' },
+        { value: 'potential', label: 'Tiềm năng' },
+        { value: 'inactive', label: 'Không hoạt động' }
+      ]
+    })}
       </form>
     `;
-    },
+  },
 
-    async createCompany() {
-        const form = document.getElementById('companyForm');
+  async createCompany() {
+    const form = document.getElementById('companyForm');
 
-        if (!Components.validateForm(form)) {
-            Components.toast('Vui lòng điền đầy đủ thông tin bắt buộc', 'error');
-            return;
-        }
+    if (!Components.validateForm(form)) {
+      Components.toast('Vui lòng điền đầy đủ thông tin bắt buộc', 'error');
+      return;
+    }
 
-        const data = Components.getFormData(form);
+    const data = Components.getFormData(form);
 
-        Components.showLoading('Đang tạo...');
+    Components.showLoading('Đang tạo...');
 
-        try {
-            await API.createCompany(data);
-            Components.hideLoading();
-            Components.closeModal();
-            Components.toast('Tạo công ty thành công!', 'success');
-            this.loadCompanies();
-        } catch (error) {
-            Components.hideLoading();
-            Components.toast(error.message, 'error');
-        }
-    },
+    try {
+      await API.createCompany(data);
+      Components.hideLoading();
+      Components.closeModal();
+      Components.toast('Tạo công ty thành công!', 'success');
+      this.loadCompanies();
+    } catch (error) {
+      Components.hideLoading();
+      Components.toast(error.message, 'error');
+    }
+  },
 
-    async updateCompany(id) {
-        const form = document.getElementById('companyForm');
+  async updateCompany(id) {
+    const form = document.getElementById('companyForm');
 
-        if (!Components.validateForm(form)) {
-            Components.toast('Vui lòng điền đầy đủ thông tin bắt buộc', 'error');
-            return;
-        }
+    if (!Components.validateForm(form)) {
+      Components.toast('Vui lòng điền đầy đủ thông tin bắt buộc', 'error');
+      return;
+    }
 
-        const data = Components.getFormData(form);
+    const data = Components.getFormData(form);
 
-        Components.showLoading('Đang lưu...');
+    Components.showLoading('Đang lưu...');
 
-        try {
-            await API.updateCompany(id, data);
-            Components.hideLoading();
-            Components.closeModal();
-            Components.toast('Cập nhật thành công!', 'success');
-            this.loadCompanies();
-        } catch (error) {
-            Components.hideLoading();
-            Components.toast(error.message, 'error');
-        }
-    },
+    try {
+      await API.updateCompany(id, data);
+      Components.hideLoading();
+      Components.closeModal();
+      Components.toast('Cập nhật thành công!', 'success');
+      this.loadCompanies();
+    } catch (error) {
+      Components.hideLoading();
+      Components.toast(error.message, 'error');
+    }
+  },
 
-    async deleteCompany(id) {
-        const confirmed = await Components.confirm(
-            'Bạn có chắc muốn xóa công ty này?',
-            { title: 'Xác nhận xóa', danger: true, confirmText: 'Xóa' }
-        );
+  async deleteCompany(id) {
+    const confirmed = await Components.confirm(
+      'Bạn có chắc muốn xóa công ty này?',
+      { title: 'Xác nhận xóa', danger: true, confirmText: 'Xóa' }
+    );
 
-        if (!confirmed) return;
+    if (!confirmed) return;
 
-        Components.showLoading('Đang xóa...');
+    Components.showLoading('Đang xóa...');
 
-        try {
-            await API.deleteCompany(id);
-            Components.hideLoading();
-            Components.toast('Đã xóa công ty', 'success');
-            this.loadCompanies();
-        } catch (error) {
-            Components.hideLoading();
-            Components.toast(error.message, 'error');
-        }
-    },
+    try {
+      await API.deleteCompany(id);
+      Components.hideLoading();
+      Components.toast('Đã xóa công ty', 'success');
+      this.loadCompanies();
+    } catch (error) {
+      Components.hideLoading();
+      Components.toast(error.message, 'error');
+    }
+  },
 
-    async viewCompany(id) {
-        Components.showLoading();
+  async viewCompany(id) {
+    Components.showLoading();
 
-        try {
-            const result = await API.getCompany(id);
-            const company = result.data;
+    try {
+      const result = await API.getCompany(id);
+      const company = result.data;
 
-            Components.hideLoading();
+      Components.hideLoading();
 
-            const content = `
+      const content = `
         <div class="detail-header">
           <div class="avatar avatar-lg" style="background: linear-gradient(135deg, ${Utils.getAvatarColor(company.name)}, ${Utils.getAvatarColor(company.name + '2')})">
             🏢
@@ -364,22 +364,22 @@ const CompaniesPage = {
         
         <div style="display: flex; gap: 12px; margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border-color-light);">
           <button class="btn btn-secondary" onclick="CompaniesPage.openEditModal('${id}'); Components.closeModal();">
-            <i class="lucide-edit"></i> Sửa
+            <i data-lucide="edit"></i> Sửa
           </button>
           <button class="btn btn-danger" onclick="CompaniesPage.deleteCompany('${id}'); Components.closeModal();">
-            <i class="lucide-trash-2"></i> Xóa
+            <i data-lucide="trash-2"></i> Xóa
           </button>
         </div>
       `;
 
-            Components.openModal('Chi tiết công ty', content, {
-                size: 'lg',
-                hideFooter: true
-            });
+      Components.openModal('Chi tiết công ty', content, {
+        size: 'lg',
+        hideFooter: true
+      });
 
-        } catch (error) {
-            Components.hideLoading();
-            Components.toast(error.message, 'error');
-        }
+    } catch (error) {
+      Components.hideLoading();
+      Components.toast(error.message, 'error');
     }
+  }
 };

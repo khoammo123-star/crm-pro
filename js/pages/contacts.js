@@ -40,7 +40,7 @@ const ContactsPage = {
       <div class="list-toolbar">
         <div class="filter-group">
           <div class="search-box">
-            <i class="lucide-search"></i>
+            <i data-lucide="search"></i>
             <input type="text" id="contactSearch" placeholder="Tìm liên hệ..." value="${this.currentFilters.search || ''}">
           </div>
           
@@ -54,7 +54,7 @@ const ContactsPage = {
         </div>
         
         <button class="btn btn-primary desktop-only" onclick="ContactsPage.openCreateModal()">
-          <i class="lucide-plus"></i> Thêm liên hệ
+          <i data-lucide="plus"></i> Thêm liên hệ
         </button>
       </div>
       
@@ -122,13 +122,13 @@ const ContactsPage = {
         <td>
           <div class="table-actions">
             <button class="btn-icon" onclick="ContactsPage.viewContact('${contact.id}')" title="Xem">
-              <i class="lucide-eye"></i>
+              <i data-lucide="eye"></i>
             </button>
             <button class="btn-icon" onclick="ContactsPage.openEditModal('${contact.id}')" title="Sửa">
-              <i class="lucide-edit"></i>
+              <i data-lucide="edit"></i>
             </button>
             <button class="btn-icon" onclick="ContactsPage.deleteContact('${contact.id}')" title="Xóa">
-              <i class="lucide-trash-2"></i>
+              <i data-lucide="trash-2"></i>
             </button>
           </div>
         </td>
@@ -175,13 +175,13 @@ const ContactsPage = {
         
         <div class="mobile-card-actions" onclick="event.stopPropagation()">
           <button class="btn btn-sm btn-secondary" onclick="ContactsPage.viewContact('${contact.id}')">
-            <i class="lucide-eye"></i> Xem
+            <i data-lucide="eye"></i> Xem
           </button>
           <button class="btn btn-sm btn-secondary" onclick="ContactsPage.openEditModal('${contact.id}')">
-            <i class="lucide-edit"></i> Sửa
+            <i data-lucide="edit"></i> Sửa
           </button>
           <button class="btn btn-sm btn-danger" onclick="ContactsPage.deleteContact('${contact.id}')">
-            <i class="lucide-trash-2"></i>
+            <i data-lucide="trash-2"></i>
           </button>
         </div>
       </div>
