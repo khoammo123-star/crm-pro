@@ -1,0 +1,473 @@
+/* =====================================================
+   CRM PRO - PAGE-SPECIFIC STYLES
+   Dashboard, Contacts, Companies, Deals, Tasks
+   ===================================================== */
+
+/* === DASHBOARD PAGE === */
+.dashboard-charts {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: var(--spacing-5);
+    margin-bottom: var(--spacing-6);
+}
+
+.chart-container {
+    height: 300px;
+    position: relative;
+}
+
+/* === PIPELINE / KANBAN === */
+.pipeline-container {
+    display: flex;
+    gap: var(--spacing-4);
+    overflow-x: auto;
+    padding-bottom: var(--spacing-4);
+}
+
+.pipeline-column {
+    min-width: 280px;
+    width: 280px;
+    flex-shrink: 0;
+    background: var(--bg-secondary);
+    border-radius: var(--radius-xl);
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100vh - 200px);
+}
+
+.pipeline-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-4);
+    border-bottom: 1px solid var(--border-color-light);
+}
+
+.pipeline-title {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+}
+
+.pipeline-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: var(--radius-full);
+}
+
+.pipeline-name {
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--font-size-sm);
+}
+
+.pipeline-count {
+    background: var(--bg-tertiary);
+    padding: 2px 8px;
+    border-radius: var(--radius-full);
+    font-size: var(--font-size-xs);
+    color: var(--text-secondary);
+}
+
+.pipeline-value {
+    font-size: var(--font-size-xs);
+    color: var(--text-tertiary);
+    margin-top: var(--spacing-1);
+}
+
+.pipeline-cards {
+    flex: 1;
+    padding: var(--spacing-3);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-3);
+}
+
+.deal-card {
+    background: var(--bg-primary);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-4);
+    box-shadow: var(--shadow-sm);
+    cursor: grab;
+    transition: all var(--transition-fast);
+    border: 1px solid var(--border-color-light);
+}
+
+.deal-card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+.deal-card.dragging {
+    opacity: 0.5;
+    cursor: grabbing;
+}
+
+.deal-card-title {
+    font-weight: var(--font-weight-medium);
+    font-size: var(--font-size-sm);
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-2);
+}
+
+.deal-card-company {
+    font-size: var(--font-size-xs);
+    color: var(--text-secondary);
+    margin-bottom: var(--spacing-3);
+}
+
+.deal-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.deal-card-value {
+    font-weight: var(--font-weight-semibold);
+    color: var(--success-600);
+    font-size: var(--font-size-sm);
+}
+
+.deal-card-date {
+    font-size: var(--font-size-xs);
+    color: var(--text-tertiary);
+}
+
+/* === CONTACTS / COMPANIES LIST === */
+.list-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--spacing-4);
+    flex-wrap: wrap;
+    gap: var(--spacing-3);
+}
+
+.filter-group {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-3);
+}
+
+.contact-row {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-4);
+}
+
+.contact-info {
+    flex: 1;
+}
+
+.contact-name {
+    font-weight: var(--font-weight-medium);
+    color: var(--text-primary);
+}
+
+.contact-email {
+    font-size: var(--font-size-xs);
+    color: var(--text-secondary);
+}
+
+/* === TASKS PAGE === */
+.task-sections {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-6);
+}
+
+.task-section {
+    background: var(--bg-primary);
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--border-color-light);
+    overflow: hidden;
+}
+
+.task-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-4) var(--spacing-5);
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-color-light);
+}
+
+.task-section-title {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+}
+
+.task-section-title.overdue {
+    color: var(--danger-600);
+}
+
+.task-section-title.today {
+    color: var(--warning-600);
+}
+
+.task-list {
+    padding: var(--spacing-3);
+}
+
+.task-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-3);
+    padding: var(--spacing-3);
+    border-radius: var(--radius-lg);
+    transition: background var(--transition-fast);
+}
+
+.task-item:hover {
+    background: var(--bg-hover);
+}
+
+.task-checkbox {
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--border-color-dark);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.task-checkbox:hover {
+    border-color: var(--primary-500);
+}
+
+.task-checkbox.checked {
+    background: var(--success-500);
+    border-color: var(--success-500);
+    color: white;
+}
+
+.task-content {
+    flex: 1;
+}
+
+.task-title {
+    font-weight: var(--font-weight-medium);
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-1);
+}
+
+.task-item.completed .task-title {
+    text-decoration: line-through;
+    color: var(--text-tertiary);
+}
+
+.task-meta {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-3);
+    font-size: var(--font-size-xs);
+    color: var(--text-secondary);
+}
+
+.task-type {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-1);
+}
+
+.task-priority {
+    padding: 2px 6px;
+    border-radius: var(--radius-sm);
+    font-weight: var(--font-weight-medium);
+}
+
+.task-priority.low {
+    background: var(--gray-100);
+    color: var(--gray-600);
+}
+
+.task-priority.medium {
+    background: var(--warning-100);
+    color: var(--warning-600);
+}
+
+.task-priority.high {
+    background: var(--orange-500);
+    color: white;
+}
+
+.task-priority.urgent {
+    background: var(--danger-500);
+    color: white;
+}
+
+.task-due {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-1);
+}
+
+.task-due.overdue {
+    color: var(--danger-600);
+}
+
+/* === RECENT ACTIVITY === */
+.activity-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.activity-item {
+    display: flex;
+    gap: var(--spacing-3);
+    padding: var(--spacing-3) 0;
+    border-bottom: 1px solid var(--border-color-light);
+}
+
+.activity-item:last-child {
+    border-bottom: none;
+}
+
+.activity-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--font-size-sm);
+    flex-shrink: 0;
+}
+
+.activity-icon.create {
+    background: var(--success-100);
+    color: var(--success-600);
+}
+
+.activity-icon.update {
+    background: var(--info-100);
+    color: var(--info-600);
+}
+
+.activity-icon.delete {
+    background: var(--danger-100);
+    color: var(--danger-600);
+}
+
+.activity-content {
+    flex: 1;
+}
+
+.activity-text {
+    font-size: var(--font-size-sm);
+    color: var(--text-primary);
+}
+
+.activity-time {
+    font-size: var(--font-size-xs);
+    color: var(--text-tertiary);
+    margin-top: var(--spacing-1);
+}
+
+/* === DETAIL VIEW === */
+.detail-header {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-4);
+    margin-bottom: var(--spacing-6);
+}
+
+.detail-avatar {
+    width: 80px;
+    height: 80px;
+    font-size: var(--font-size-2xl);
+}
+
+.detail-info {
+    flex: 1;
+}
+
+.detail-name {
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
+    margin-bottom: var(--spacing-2);
+}
+
+.detail-meta {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-4);
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+}
+
+.detail-tabs {
+    margin-bottom: var(--spacing-6);
+}
+
+.detail-section {
+    margin-bottom: var(--spacing-6);
+}
+
+.detail-section-title {
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    margin-bottom: var(--spacing-4);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+}
+
+.detail-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-4);
+}
+
+.detail-field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-1);
+}
+
+.detail-label {
+    font-size: var(--font-size-xs);
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.detail-value {
+    font-size: var(--font-size-sm);
+    color: var(--text-primary);
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 1024px) {
+    .dashboard-charts {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .pipeline-column {
+        min-width: 260px;
+        width: 260px;
+    }
+
+    .list-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .filter-group {
+        flex-wrap: wrap;
+    }
+
+    .detail-grid {
+        grid-template-columns: 1fr;
+    }
+}

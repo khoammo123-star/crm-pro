@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM Pro - Hướng dẫn Setup</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.8;
+            font-size: 1.1em;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .step {
+            background: #f9fafb;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            position: relative;
+            border-left: 4px solid #667eea;
+        }
+
+        .step-number {
+            position: absolute;
+            left: -20px;
+            top: 20px;
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .step h3 {
+            color: #1f2937;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .step p {
+            color: #4b5563;
+            line-height: 1.7;
+            margin-bottom: 15px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 25px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: none;
+            cursor: pointer;
+            font-size: 1em;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #e5e7eb;
+            color: #374151;
+        }
+
+        .btn-secondary:hover {
+            background: #d1d5db;
+            box-shadow: none;
+        }
+
+        .code-box {
+            background: #1f2937;
+            color: #10b981;
+            padding: 15px 20px;
+            border-radius: 8px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+
+        .highlight {
+            background: #fef3c7;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .warning {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            padding: 15px;
+            border-radius: 8px;
+            color: #dc2626;
+            margin: 15px 0;
+        }
+
+        .success {
+            background: #ecfdf5;
+            border: 1px solid #a7f3d0;
+            padding: 15px;
+            border-radius: 8px;
+            color: #059669;
+            margin: 15px 0;
+        }
+
+        .links {
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .copy-area {
+            position: relative;
+            margin: 15px 0;
+        }
+
+        .copy-area textarea {
+            width: 100%;
+            height: 100px;
+            padding: 15px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-family: monospace;
+            resize: vertical;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 8px 15px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .footer {
+            background: #f9fafb;
+            padding: 30px;
+            text-align: center;
+            color: #6b7280;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 CRM Pro Setup</h1>
+            <p>Chỉ cần 5 phút để hoàn thành!</p>
+        </div>
+
+        <div class="content">
+
+            <!-- Step 1 -->
+            <div class="step">
+                <div class="step-number">1</div>
+                <h3>Tạo Google Sheets mới</h3>
+                <p>Click nút bên dưới để mở Google Sheets và tạo Spreadsheet mới:</p>
+                <a href="https://sheets.new" target="_blank" class="btn">Tạo Google Sheets mới →</a>
+                <p style="margin-top: 15px"><strong>Sau khi tạo:</strong> Đặt tên sheet là "CRM Database" (hoặc tên bạn
+                    muốn)</p>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="step">
+                <div class="step-number">2</div>
+                <h3>Copy Spreadsheet ID</h3>
+                <p>Trong URL của Google Sheets, copy phần ID:</p>
+                <div class="code-box">
+                    https://docs.google.com/spreadsheets/d/<span class="highlight"
+                        style="color: #fbbf24;">COPY_PHAN_NAY</span>/edit
+                </div>
+                <p>Paste vào đây để lưu:</p>
+                <div class="copy-area">
+                    <textarea id="spreadsheetId" placeholder="Paste Spreadsheet ID vào đây..."></textarea>
+                </div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="step">
+                <div class="step-number">3</div>
+                <h3>Mở Apps Script</h3>
+                <p>Trong Google Sheets vừa tạo:</p>
+                <ol style="margin-left: 20px; color: #4b5563; line-height: 2;">
+                    <li>Click menu <strong>Extensions</strong> (Tiện ích mở rộng)</li>
+                    <li>Chọn <strong>Apps Script</strong></li>
+                    <li>Một tab mới sẽ mở ra với code editor</li>
+                </ol>
+            </div>
+
+            <!-- Step 4 -->
+            <div class="step">
+                <div class="step-number">4</div>
+                <h3>Copy toàn bộ code</h3>
+                <p>Mở file <strong>CRM_COMPLETE.js</strong> trong thư mục CRM, copy toàn bộ nội dung.</p>
+                <p><strong>Hoặc</strong> click nút bên dưới để mở file:</p>
+                <button class="btn btn-secondary"
+                    onclick="alert('Mở file: c:\\Users\\Admin\\Downloads\\crm\\CRM_COMPLETE.js')">
+                    📄 Mở CRM_COMPLETE.js
+                </button>
+
+                <div class="warning">
+                    <strong>⚠️ Quan trọng:</strong> Trong code, tìm và thay thế:
+                    <br><code>YOUR_SPREADSHEET_ID_HERE</code> → <strong>ID bạn vừa copy ở bước 2</strong>
+                </div>
+            </div>
+
+            <!-- Step 5 -->
+            <div class="step">
+                <div class="step-number">5</div>
+                <h3>Paste vào Apps Script</h3>
+                <ol style="margin-left: 20px; color: #4b5563; line-height: 2;">
+                    <li>Trong Apps Script editor, <strong>xóa hết code mặc định</strong></li>
+                    <li><strong>Paste toàn bộ code</strong> đã copy</li>
+                    <li>Click <strong>💾 Save</strong> (Ctrl+S)</li>
+                </ol>
+            </div>
+
+            <!-- Step 6 -->
+            <div class="step">
+                <div class="step-number">6</div>
+                <h3>Deploy Web App</h3>
+                <ol style="margin-left: 20px; color: #4b5563; line-height: 2;">
+                    <li>Click nút <strong>Deploy</strong> (góc trên phải)</li>
+                    <li>Chọn <strong>New deployment</strong></li>
+                    <li>Click ⚙️ → Chọn <strong>Web app</strong></li>
+                    <li>Cấu hình:
+                        <ul>
+                            <li><strong>Execute as:</strong> Me</li>
+                            <li><strong>Who has access:</strong> Anyone</li>
+                        </ul>
+                    </li>
+                    <li>Click <strong>Deploy</strong></li>
+                    <li>Click <strong>Authorize access</strong> → Chọn tài khoản Google → Allow</li>
+                    <li><strong>Copy Web app URL</strong></li>
+                </ol>
+
+                <div class="success">
+                    <strong>✅ URL xong:</strong> Paste URL vào đây để lưu:
+                </div>
+                <div class="copy-area">
+                    <textarea id="webAppUrl" placeholder="Paste Web App URL vào đây..."></textarea>
+                </div>
+            </div>
+
+            <!-- Step 7 -->
+            <div class="step">
+                <div class="step-number">7</div>
+                <h3>Mở CRM!</h3>
+                <p>Mở file <strong>index.html</strong> trong thư mục CRM:</p>
+                <ol style="margin-left: 20px; color: #4b5563; line-height: 2;">
+                    <li>Double-click file <strong>index.html</strong></li>
+                    <li>Paste <strong>Web App URL</strong> vào ô cài đặt</li>
+                    <li>Click <strong>Lưu</strong></li>
+                    <li>🎉 <strong>Xong! CRM đã sẵn sàng sử dụng!</strong></li>
+                </ol>
+
+                <div style="margin-top: 20px; text-align: center;">
+                    <button class="btn" onclick="window.open('file:///c:/Users/Admin/Downloads/crm/index.html')">
+                        🚀 Mở CRM Pro
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="footer">
+            <p>CRM Pro - Built with 💜 using Google Sheets + Apps Script</p>
+            <p style="margin-top: 10px; font-size: 0.9em;">Nếu cần hỗ trợ, hãy hỏi tôi!</p>
+        </div>
+    </div>
+
+    <script>
+        // Auto-save to localStorage
+        document.getElementById('spreadsheetId').addEventListener('input', function () {
+            localStorage.setItem('crm_spreadsheet_id', this.value);
+        });
+        document.getElementById('webAppUrl').addEventListener('input', function () {
+            localStorage.setItem('crm_api_url', this.value);
+        });
+
+        // Load saved values
+        window.onload = function () {
+            document.getElementById('spreadsheetId').value = localStorage.getItem('crm_spreadsheet_id') || '';
+            document.getElementById('webAppUrl').value = localStorage.getItem('crm_api_url') || '';
+        }
+    </script>
+</body>
+
+</html>

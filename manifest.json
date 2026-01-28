@@ -1,0 +1,59 @@
+{
+    "name": "CRM Pro - Quản lý khách hàng",
+    "short_name": "CRM Pro",
+    "description": "Hệ thống quản lý khách hàng chuyên nghiệp, miễn phí",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#0f172a",
+    "theme_color": "#6366f1",
+    "orientation": "portrait-primary",
+    "scope": "/",
+    "lang": "vi",
+    "categories": [
+        "business",
+        "productivity"
+    ],
+    "icons": [
+        {
+            "src": "icons/icon.svg",
+            "sizes": "any",
+            "type": "image/svg+xml",
+            "purpose": "any"
+        }
+    ],
+    "screenshots": [
+        {
+            "src": "icons/screenshot-1.png",
+            "sizes": "1280x720",
+            "type": "image/png",
+            "form_factor": "wide",
+            "label": "Dashboard CRM Pro"
+        }
+    ],
+    "shortcuts": [
+        {
+            "name": "Thêm liên hệ",
+            "short_name": "Liên hệ mới",
+            "description": "Thêm liên hệ mới vào hệ thống",
+            "url": "/#contacts",
+            "icons": [
+                {
+                    "src": "icons/icon-96.png",
+                    "sizes": "96x96"
+                }
+            ]
+        },
+        {
+            "name": "Xem Deals",
+            "short_name": "Deals",
+            "description": "Xem danh sách deals",
+            "url": "/#deals",
+            "icons": [
+                {
+                    "src": "icons/icon-96.png",
+                    "sizes": "96x96"
+                }
+            ]
+        }
+    ]
+}

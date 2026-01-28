@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#6366f1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>CRM Pro - Quản lý khách hàng</title>
+  <meta name="description" content="Hệ thống quản lý khách hàng chuyên nghiệp">
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/icon.svg">
+  <link rel="icon" type="image/svg+xml" href="icons/icon.svg">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lucide-static@0.263.1/font/lucide.min.css">
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Sortable.js for Kanban -->
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="styles/variables.css">
+  <link rel="stylesheet" href="styles/main.css">
+  <link rel="stylesheet" href="styles/components.css">
+  <link rel="stylesheet" href="styles/layout.css">
+  <link rel="stylesheet" href="styles/pages.css">
+  <link rel="stylesheet" href="styles/mobile.css">
+</head>
+
+<body>
+  <div id="app">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <span class="logo-icon">📊</span>
+          <span class="logo-text">CRM Pro</span>
+        </div>
+        <button class="sidebar-toggle" id="sidebarToggle">
+          <i class="lucide-menu"></i>
+        </button>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="#dashboard" class="nav-item active" data-page="dashboard">
+          <i class="lucide-layout-dashboard"></i>
+          <span>Dashboard</span>
+        </a>
+        <a href="#contacts" class="nav-item" data-page="contacts">
+          <i class="lucide-users"></i>
+          <span>Liên hệ</span>
+        </a>
+        <a href="#companies" class="nav-item" data-page="companies">
+          <i class="lucide-building-2"></i>
+          <span>Công ty</span>
+        </a>
+        <a href="#deals" class="nav-item" data-page="deals">
+          <i class="lucide-trending-up"></i>
+          <span>Deals</span>
+        </a>
+        <a href="#tasks" class="nav-item" data-page="tasks">
+          <i class="lucide-check-square"></i>
+          <span>Công việc</span>
+          <span class="badge" id="taskBadge" style="display:none">0</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="btn-icon" id="themeToggle" title="Chuyển theme">
+          <i class="lucide-moon"></i>
+        </button>
+        <button class="btn-icon" id="settingsBtn" title="Cài đặt">
+          <i class="lucide-settings"></i>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Header -->
+      <header class="main-header">
+        <div class="header-left">
+          <button class="btn-icon mobile-menu" id="mobileMenuBtn">
+            <i class="lucide-menu"></i>
+          </button>
+          <h1 class="page-title" id="pageTitle">Dashboard</h1>
+        </div>
+
+        <div class="header-right">
+          <div class="search-box">
+            <i class="lucide-search"></i>
+            <input type="text" id="globalSearch" placeholder="Tìm kiếm...">
+          </div>
+
+          <button class="btn btn-primary" id="addNewBtn">
+            <i class="lucide-plus"></i>
+            <span>Thêm mới</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Page Container -->
+      <div class="page-container" id="pageContainer">
+        <!-- Dashboard Page -->
+        <div class="page" id="dashboardPage">
+          <!-- Will be populated by JS -->
+        </div>
+
+        <!-- Contacts Page -->
+        <div class="page" id="contactsPage" style="display:none">
+          <!-- Will be populated by JS -->
+        </div>
+
+        <!-- Companies Page -->
+        <div class="page" id="companiesPage" style="display:none">
+          <!-- Will be populated by JS -->
+        </div>
+
+        <!-- Deals Page -->
+        <div class="page" id="dealsPage" style="display:none">
+          <!-- Will be populated by JS -->
+        </div>
+
+        <!-- Tasks Page -->
+        <div class="page" id="tasksPage" style="display:none">
+          <!-- Will be populated by JS -->
+        </div>
+      </div>
+    </main>
+
+    <!-- Mobile Overlay -->
+    <div class="mobile-overlay" id="mobileOverlay"></div>
+
+    <!-- Bottom Navigation (Mobile) -->
+    <nav class="bottom-nav" id="bottomNav">
+      <div class="bottom-nav-items">
+        <a href="#dashboard" class="bottom-nav-item active" data-page="dashboard">
+          <i class="lucide-layout-dashboard"></i>
+          <span>Dashboard</span>
+        </a>
+        <a href="#contacts" class="bottom-nav-item" data-page="contacts">
+          <i class="lucide-users"></i>
+          <span>Liên hệ</span>
+        </a>
+        <a href="#companies" class="bottom-nav-item" data-page="companies">
+          <i class="lucide-building-2"></i>
+          <span>Công ty</span>
+        </a>
+        <a href="#deals" class="bottom-nav-item" data-page="deals">
+          <i class="lucide-trending-up"></i>
+          <span>Deals</span>
+        </a>
+        <a href="#tasks" class="bottom-nav-item" data-page="tasks">
+          <i class="lucide-check-square"></i>
+          <span>Tasks</span>
+        </a>
+      </div>
+    </nav>
+
+    <!-- Floating Action Button (Mobile) -->
+    <button class="fab" id="fabBtn" title="Thêm mới">
+      <i class="lucide-plus"></i>
+    </button>
+  </div>
+
+  <!-- Modal Container -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal" id="modal">
+      <div class="modal-header">
+        <h2 class="modal-title" id="modalTitle">Modal</h2>
+        <button class="btn-icon modal-close" id="modalClose">
+          <i class="lucide-x"></i>
+        </button>
+      </div>
+      <div class="modal-body" id="modalBody">
+        <!-- Modal content -->
+      </div>
+      <div class="modal-footer" id="modalFooter">
+        <button class="btn btn-secondary" id="modalCancel">Hủy</button>
+        <button class="btn btn-primary" id="modalConfirm">Xác nhận</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" id="loadingOverlay" style="display:none">
+    <div class="loading-spinner"></div>
+    <p>Đang tải...</p>
+  </div>
+
+  <!-- Settings Modal -->
+  <div class="modal-overlay" id="settingsOverlay" style="display:none">
+    <div class="modal settings-modal">
+      <div class="modal-header">
+        <h2 class="modal-title">⚙️ Cài đặt</h2>
+        <button class="btn-icon modal-close" onclick="closeSettingsModal()">
+          <i class="lucide-x"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>URL Apps Script Web App</label>
+          <input type="text" id="apiUrlInput" class="form-input" placeholder="https://script.google.com/macros/s/...">
+          <small class="form-hint">Paste URL sau khi deploy Apps Script</small>
+        </div>
+        <div class="form-group">
+          <label>Theme</label>
+          <select id="themeSelect" class="form-select">
+            <option value="light">Sáng</option>
+            <option value="dark">Tối</option>
+            <option value="auto">Tự động</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeSettingsModal()">Đóng</button>
+        <button class="btn btn-primary" onclick="saveSettings()">Lưu cài đặt</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/config.js"></script>
+  <script src="js/cache.js"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/components.js"></script>
+  <script src="js/pages/dashboard.js"></script>
+  <script src="js/pages/contacts.js"></script>
+  <script src="js/pages/companies.js"></script>
+  <script src="js/pages/deals.js"></script>
+  <script src="js/pages/tasks.js"></script>
+  <script src="js/app.js"></script>
+
+  <!-- Service Worker Registration -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/service-worker.js')
+          .then((registration) => {
+            console.log('[PWA] Service Worker registered:', registration.scope);
+          })
+          .catch((error) => {
+            console.log('[PWA] Service Worker registration failed:', error);
+          });
+      });
+    }
+  </script>
+</body>
+
+</html>

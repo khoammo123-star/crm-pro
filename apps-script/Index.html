@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <base target="_top">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM Pro - Quản lý khách hàng</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lucide-static@0.263.1/font/lucide.min.css">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Sortable.js -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+
+    <style>
+        <? !=include('Styles');
+        ?>
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <span class="logo-icon">📊</span>
+                    <span class="logo-text">CRM Pro</span>
+                </div>
+                <button class="sidebar-toggle" id="sidebarToggle">
+                    <i class="lucide-menu"></i>
+                </button>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="#dashboard" class="nav-item active" data-page="dashboard">
+                    <i class="lucide-layout-dashboard"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#contacts" class="nav-item" data-page="contacts">
+                    <i class="lucide-users"></i>
+                    <span>Liên hệ</span>
+                </a>
+                <a href="#companies" class="nav-item" data-page="companies">
+                    <i class="lucide-building-2"></i>
+                    <span>Công ty</span>
+                </a>
+                <a href="#deals" class="nav-item" data-page="deals">
+                    <i class="lucide-trending-up"></i>
+                    <span>Deals</span>
+                </a>
+                <a href="#tasks" class="nav-item" data-page="tasks">
+                    <i class="lucide-check-square"></i>
+                    <span>Công việc</span>
+                    <span class="badge" id="taskBadge" style="display:none">0</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button class="btn-icon" id="themeToggle" title="Chuyển theme">
+                    <i class="lucide-moon"></i>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="main-header">
+                <div class="header-left">
+                    <button class="btn-icon mobile-menu" id="mobileMenuBtn">
+                        <i class="lucide-menu"></i>
+                    </button>
+                    <h1 class="page-title" id="pageTitle">Dashboard</h1>
+                </div>
+
+                <div class="header-right">
+                    <div class="search-box">
+                        <i class="lucide-search"></i>
+                        <input type="text" id="globalSearch" placeholder="Tìm kiếm...">
+                    </div>
+
+                    <button class="btn btn-primary" id="addNewBtn">
+                        <i class="lucide-plus"></i>
+                        <span>Thêm mới</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Page Container -->
+            <div class="page-container" id="pageContainer">
+                <div class="page" id="dashboardPage"></div>
+                <div class="page" id="contactsPage" style="display:none"></div>
+                <div class="page" id="companiesPage" style="display:none"></div>
+                <div class="page" id="dealsPage" style="display:none"></div>
+                <div class="page" id="tasksPage" style="display:none"></div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal Container -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal" id="modal">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Modal</h2>
+                <button class="btn-icon modal-close" id="modalClose">
+                    <i class="lucide-x"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="modalBody"></div>
+            <div class="modal-footer" id="modalFooter">
+                <button class="btn btn-secondary" id="modalCancel">Hủy</button>
+                <button class="btn btn-primary" id="modalConfirm">Xác nhận</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay" style="display:none">
+        <div class="loading-spinner"></div>
+        <p>Đang tải...</p>
+    </div>
+
+    <script>
+        // API sử dụng google.script.run để gọi server-side functions
+        const API = {
+            async request(action, data = {}) {
+                return new Promise((resolve, reject) => {
+                    google.script.run
+                        .withSuccessHandler(result => {
+                            if (result.success) {
+                                resolve(result);
+                            } else {
+                                reject(new Error(result.error || 'Có lỗi xảy ra'));
+                            }
+                        })
+                        .withFailureHandler(error => {
+                            reject(new Error(error.message || 'Có lỗi xảy ra'));
+                        })
+                        .handleClientRequest(action, data);
+                });
+            },
+
+            // Config
+            async getConfig() { return this.request('getConfig'); },
+            async testConnection() { return this.request('testConnection'); },
+
+            // Dashboard
+            async getDashboardStats() { return this.request('getDashboardStats'); },
+
+            // Contacts
+            async getContacts(params = {}) { return this.request('getContacts', params); },
+            async getContact(id) { return this.request('getContact', { id }); },
+            async createContact(data) { return this.request('createContact', data); },
+            async updateContact(id, data) { return this.request('updateContact', { id, ...data }); },
+            async deleteContact(id) { return this.request('deleteContact', { id }); },
+
+            // Companies
+            async getCompanies(params = {}) { return this.request('getCompanies', params); },
+            async getCompany(id) { return this.request('getCompany', { id }); },
+            async createCompany(data) { return this.request('createCompany', data); },
+            async updateCompany(id, data) { return this.request('updateCompany', { id, ...data }); },
+            async deleteCompany(id) { return this.request('deleteCompany', { id }); },
+
+            // Deals
+            async getDeals(params = {}) { return this.request('getDeals', params); },
+            async getDeal(id) { return this.request('getDeal', { id }); },
+            async createDeal(data) { return this.request('createDeal', data); },
+            async updateDeal(id, data) { return this.request('updateDeal', { id, ...data }); },
+            async deleteDeal(id) { return this.request('deleteDeal', { id }); },
+            async getDealsPipeline() { return this.request('getDealsPipeline'); },
+            async updateDealStage(id, stage) { return this.request('updateDealStage', { id, stage }); },
+
+            // Tasks
+            async getTasks(params = {}) { return this.request('getTasks', params); },
+            async getTask(id) { return this.request('getTask', { id }); },
+            async createTask(data) { return this.request('createTask', data); },
+            async updateTask(id, data) { return this.request('updateTask', { id, ...data }); },
+            async deleteTask(id) { return this.request('deleteTask', { id }); },
+            async completeTask(id) { return this.request('completeTask', { id }); },
+            async getOverdueTasks() { return this.request('getOverdueTasks'); },
+            async getTodayTasks() { return this.request('getTodayTasks'); }
+        };
+
+        // Dummy AppConfig for compatibility
+        const AppConfig = {
+            isConfigured() { return true; },
+            getApiUrl() { return 'apps-script'; }
+        };
+
+        let AppData = { loaded: false };
+    </script>
+
+    <script>
+    <?!= include('Scripts'); ?>
+    </script>
+</body>
+
+</html>
