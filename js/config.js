@@ -7,14 +7,14 @@ const AppConfig = {
     VERSION: '2.0.0',
 
     // Database type: 'sheets' or 'supabase'
-    DATABASE_TYPE: localStorage.getItem('crm_database_type') || 'sheets',
+    DATABASE_TYPE: localStorage.getItem('crm_database_type') || 'supabase',
 
     // Google Sheets API URL
     API_URL: localStorage.getItem('crm_api_url') || '',
 
-    // Supabase config
-    SUPABASE_URL: localStorage.getItem('crm_supabase_url') || '',
-    SUPABASE_ANON_KEY: localStorage.getItem('crm_supabase_key') || '',
+    // Supabase config (hardcoded for easy deployment)
+    SUPABASE_URL: localStorage.getItem('crm_supabase_url') || 'https://nkjakqtffuowajsmioff.supabase.co',
+    SUPABASE_ANON_KEY: localStorage.getItem('crm_supabase_key') || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ramFrcXRmZnVvd2Fqc21pb2ZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk1ODU1MDQsImV4cCI6MjA4NTE2MTUwNH0.kJ4B9yzSYuJAUMF9VPbR2oxP4K0b7KhDy813joeFJQs',
 
     // Default settings
     DEFAULT_PAGE_SIZE: 20,
