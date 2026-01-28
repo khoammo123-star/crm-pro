@@ -332,8 +332,7 @@ function openSettingsModal() {
     const overlay = document.getElementById('settingsOverlay');
     overlay.style.display = 'flex';
 
-    // Load current settings
-    document.getElementById('apiUrlInput').value = AppConfig.getApiUrl() || '';
+    // Load current theme
     document.getElementById('themeSelect').value = localStorage.getItem(AppConfig.STORAGE_KEYS.THEME) || 'dark';
 
     // Re-render icons
@@ -347,23 +346,13 @@ function closeSettingsModal() {
 }
 
 function saveSettings() {
-    const apiUrl = document.getElementById('apiUrlInput').value.trim();
     const theme = document.getElementById('themeSelect').value;
-
-    if (apiUrl) {
-        AppConfig.setApiUrl(apiUrl);
-    }
 
     localStorage.setItem(AppConfig.STORAGE_KEYS.THEME, theme);
     applyTheme(theme);
 
     Components.toast('Đã lưu cài đặt', 'success');
     closeSettingsModal();
-
-    // Reload data if API was just configured
-    if (apiUrl) {
-        location.reload();
-    }
 }
 
 function applyTheme(theme) {

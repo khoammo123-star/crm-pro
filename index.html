@@ -208,7 +208,7 @@
     <p>Đang tải...</p>
   </div>
 
-  <!-- Settings Modal -->
+  <!-- Settings Modal (Theme only) -->
   <div class="modal-overlay" id="settingsOverlay" style="display:none">
     <div class="modal settings-modal">
       <div class="modal-header">
@@ -219,22 +219,24 @@
       </div>
       <div class="modal-body">
         <div class="form-group">
-          <label>URL Apps Script Web App</label>
-          <input type="text" id="apiUrlInput" class="form-input" placeholder="https://script.google.com/macros/s/...">
-          <small class="form-hint">Paste URL sau khi deploy Apps Script</small>
+          <label>🎨 Giao diện</label>
+          <select id="themeSelect" class="form-select">
+            <option value="light">☀️ Sáng</option>
+            <option value="dark">🌙 Tối</option>
+            <option value="auto">🔄 Tự động</option>
+          </select>
         </div>
         <div class="form-group">
-          <label>Theme</label>
-          <select id="themeSelect" class="form-select">
-            <option value="light">Sáng</option>
-            <option value="dark">Tối</option>
-            <option value="auto">Tự động</option>
-          </select>
+          <label>📊 Backend</label>
+          <div class="info-box">
+            <strong>Supabase</strong><br>
+            <small style="color: var(--text-secondary)">Đã cố định - không cần cấu hình</small>
+          </div>
         </div>
       </div>
       <div class="modal-footer">
         <button class="btn btn-secondary" onclick="closeSettingsModal()">Đóng</button>
-        <button class="btn btn-primary" onclick="saveSettings()">Lưu cài đặt</button>
+        <button class="btn btn-primary" onclick="saveSettings()">Lưu</button>
       </div>
     </div>
   </div>
