@@ -128,20 +128,41 @@ const DashboardPage = {
         ${Components.statCard('✅', 'Tasks hôm nay', stats.tasks.dueToday, null, 'orange')}
       </div>
       
-      <!-- Reminder Cards (new) -->
-      <div class="stats-grid mt-4">
-        <div class="stat-card clickable" onclick="App.navigateTo('contacts')" id="dueRemindersCard">
-          <div class="stat-icon" style="background: linear-gradient(135deg, #ef4444 20%, #f87171 100%); color: white;">🔔</div>
-          <div class="stat-content">
-            <div class="stat-label">Cần gọi hôm nay</div>
-            <div class="stat-value" id="dueRemindersCount">--</div>
-          </div>
+      <!-- Alert Cards - 4 levels -->
+      <div class="card mt-4">
+        <div class="card-header">
+          <h3 class="card-title">🔔 Khách cần chăm sóc</h3>
         </div>
-        <div class="stat-card clickable" onclick="App.navigateTo('contacts')" id="upcomingNeedsCard">
-          <div class="stat-icon" style="background: linear-gradient(135deg, #f59e0b 20%, #fbbf24 100%); color: white;">📦</div>
-          <div class="stat-content">
-            <div class="stat-label">Sắp cần SP (7 ngày)</div>
-            <div class="stat-value" id="upcomingNeedsCount">--</div>
+        <div class="card-body">
+          <div class="alert-grid" id="alertGrid">
+            <div class="alert-item alert-critical" onclick="App.navigateTo('contacts')">
+              <span class="alert-icon">🚨</span>
+              <div class="alert-info">
+                <div class="alert-label">Khẩn cấp (≤5 ngày)</div>
+                <div class="alert-count" id="alertCritical">--</div>
+              </div>
+            </div>
+            <div class="alert-item alert-urgent" onclick="App.navigateTo('contacts')">
+              <span class="alert-icon">⚠️</span>
+              <div class="alert-info">
+                <div class="alert-label">Sắp đến (6-7 ngày)</div>
+                <div class="alert-count" id="alertUrgent">--</div>
+              </div>
+            </div>
+            <div class="alert-item alert-warning" onclick="App.navigateTo('contacts')">
+              <span class="alert-icon">⏰</span>
+              <div class="alert-info">
+                <div class="alert-label">Chú ý (8-10 ngày)</div>
+                <div class="alert-count" id="alertWarning">--</div>
+              </div>
+            </div>
+            <div class="alert-item alert-info" onclick="App.navigateTo('contacts')">
+              <span class="alert-icon">📅</span>
+              <div class="alert-info">
+                <div class="alert-label">Chuẩn bị (11-15 ngày)</div>
+                <div class="alert-count" id="alertInfo">--</div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -320,30 +341,33 @@ const DashboardPage = {
   // Load reminder counts from RPC functions
   async loadReminderCounts() {
     try {
-      const backend = API.getBackend();
-      if (!backend) return;
+      // Call RPC count_contacts_by_alert
+      const result = await SupabaseAPI.rpc('count_contacts_by_alert');
 
-      // Parallel calls for performance
-      const [dueResult, upcomingResult] = await Promise.all([
-        backend.countDueReminders(),
-        backend.countUpcomingNeeds(7)
-      ]);
+      if (result && result.length > 0) {
+        const data = result[0];
 
-      // Update UI
-      const dueEl = document.getElementById('dueRemindersCount');
-      const upcomingEl = document.getElementById('upcomingNeedsCount');
+        // Update UI elements
+        const criticalEl = document.getElementById('alertCritical');
+        const urgentEl = document.getElementById('alertUrgent');
+        const warningEl = document.getElementById('alertWarning');
+        const infoEl = document.getElementById('alertInfo');
 
-      if (dueEl) {
-        dueEl.textContent = dueResult.count || 0;
-        if (dueResult.count > 0) {
-          dueEl.classList.add('text-danger');
+        if (criticalEl) {
+          criticalEl.textContent = data.critical_count || 0;
+          if (data.critical_count > 0) criticalEl.classList.add('has-items');
         }
-      }
-      if (upcomingEl) {
-        upcomingEl.textContent = upcomingResult.count || 0;
+        if (urgentEl) urgentEl.textContent = data.urgent_count || 0;
+        if (warningEl) warningEl.textContent = data.warning_count || 0;
+        if (infoEl) infoEl.textContent = data.info_count || 0;
       }
     } catch (error) {
       console.error('[Dashboard] loadReminderCounts error:', error);
+      // Fallback: set all to 0
+      ['alertCritical', 'alertUrgent', 'alertWarning', 'alertInfo'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = '0';
+      });
     }
   }
 };

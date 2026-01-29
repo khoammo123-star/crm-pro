@@ -328,6 +328,12 @@ const ContactsPage = {
       confirmText: 'Tạo liên hệ',
       onConfirm: () => this.createContact()
     });
+
+    // Init cascade after modal renders
+    setTimeout(() => {
+      this.initProvinceDistrictCascade();
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+    }, 100);
   },
 
   async openEditModal(id) {
@@ -346,6 +352,12 @@ const ContactsPage = {
         onConfirm: () => this.updateContact(id)
       });
 
+      // Init cascade after modal renders
+      setTimeout(() => {
+        this.initProvinceDistrictCascade();
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+      }, 100);
+
     } catch (error) {
       Components.hideLoading();
       Components.toast(error.message, 'error');
@@ -353,80 +365,172 @@ const ContactsPage = {
   },
 
   renderContactForm(contact = {}) {
-    const sources = AppData.sources || ['Website', 'Facebook', 'Zalo', 'Giới thiệu', 'Khác'];
     const statuses = AppData.contactStatuses || [
       { id: 'lead', name: 'Lead' },
       { id: 'prospect', name: 'Tiềm năng' },
       { id: 'customer', name: 'Khách hàng' },
       { id: 'inactive', name: 'Không hoạt động' }
     ];
-    const priorities = [
-      { id: 'low', name: '🔵 Thấp' },
-      { id: 'normal', name: '🟢 Bình thường' },
-      { id: 'high', name: '🟠 Cao' },
-      { id: 'urgent', name: '🔴 Khẩn cấp' }
+
+    // Preset sources
+    const sources = [
+      { id: 'facebook', name: '📘 Facebook' },
+      { id: 'youtube', name: '📺 YouTube' },
+      { id: 'tiktok', name: '🎵 TikTok' },
+      { id: 'instagram', name: '📸 Instagram' },
+      { id: 'zalo', name: '💬 Zalo' },
+      { id: 'website', name: '🌐 Website' },
+      { id: 'n8n', name: '🤖 N8N' },
+      { id: 'referral', name: '👥 Giới thiệu' },
+      { id: 'phone', name: '📞 Gọi điện' },
+      { id: 'other', name: '📋 Khác' }
     ];
+
+    // Get provinces list
+    const provinces = typeof VietnamData !== 'undefined' ? VietnamData.getProvinces() : [];
+    const districts = contact.province && typeof VietnamData !== 'undefined'
+      ? VietnamData.getDistricts(contact.province)
+      : [];
 
     return `
       <form id="contactForm">
+        <!-- Thông tin khách hàng -->
+        <h4 class="form-section-title">👤 Thông tin khách hàng</h4>
+        
         <div class="form-row">
-          ${Components.formField('first_name', 'Tên', 'text', { value: contact.first_name, required: true, placeholder: 'Nhập tên' })}
-          ${Components.formField('last_name', 'Họ', 'text', { value: contact.last_name, placeholder: 'Nhập họ' })}
+          ${Components.formField('first_name', 'Tên khách *', 'text', {
+      value: contact.first_name,
+      required: true,
+      placeholder: 'Nhập tên khách hàng'
+    })}
+          ${Components.formField('phone', 'Số điện thoại *', 'tel', {
+      value: contact.phone,
+      required: true,
+      placeholder: '0912345678'
+    })}
+        </div>
+        
+        ${Components.formField('zalo_phone', 'SĐT Zalo (nếu khác)', 'tel', {
+      value: contact.zalo_phone,
+      placeholder: 'Để trống nếu dùng SĐT chính'
+    })}
+        
+        <!-- Sản phẩm & Thời gian -->
+        <h4 class="form-section-title">📦 Sản phẩm & Thời gian</h4>
+        
+        <div class="form-row">
+          ${Components.formField('product_needed', 'Sản phẩm cần *', 'text', {
+      value: contact.product_needed,
+      required: true,
+      placeholder: 'VD: Máy bơm nước, Bồn inox...',
+      list: 'productsList'
+    })}
+          ${Components.formField('expected_need_date', 'Ngày cần SP *', 'date', {
+      value: contact.expected_need_date,
+      required: true
+    })}
+        </div>
+        
+        <!-- Địa chỉ -->
+        <h4 class="form-section-title">📍 Địa chỉ</h4>
+        
+        <div class="form-row">
+          ${Components.formField('province', 'Tỉnh/Thành phố', 'select', {
+      value: contact.province,
+      options: [
+        { value: '', label: '-- Chọn tỉnh --' },
+        ...provinces.map(p => ({ value: p.id, label: p.name }))
+      ]
+    })}
+          ${Components.formField('district', 'Quận/Huyện', 'select', {
+      value: contact.district,
+      options: [
+        { value: '', label: '-- Chọn huyện --' },
+        ...districts.map(d => ({ value: d.id, label: d.name }))
+      ]
+    })}
         </div>
         
         <div class="form-row">
-          ${Components.formField('email', 'Email', 'email', { value: contact.email, placeholder: 'email@example.com' })}
-          ${Components.formField('phone', 'Điện thoại', 'tel', { value: contact.phone, placeholder: '0912345678' })}
+          ${Components.formField('google_map_url', 'Link Google Map', 'url', {
+      value: contact.google_map_url,
+      placeholder: 'https://maps.google.com/...'
+    })}
+          <div class="form-group">
+            <label>&nbsp;</label>
+            <a href="${contact.google_map_url || '#'}" target="_blank" class="btn btn-secondary btn-sm ${!contact.google_map_url ? 'disabled' : ''}" id="openMapBtn">
+              <i data-lucide="map-pin"></i> Mở Map
+            </a>
+          </div>
         </div>
         
-        ${Components.formField('position', 'Chức vụ', 'text', { value: contact.position, placeholder: 'Ví dụ: Giám đốc' })}
+        <!-- Phân loại -->
+        <h4 class="form-section-title">📊 Phân loại</h4>
         
         <div class="form-row">
           ${Components.formField('status', 'Trạng thái', 'select', {
       value: contact.status || 'lead',
       options: statuses.map(s => ({ value: s.id, label: s.name }))
     })}
-          ${Components.formField('source', 'Nguồn', 'select', {
+          ${Components.formField('source', 'Nguồn khách', 'select', {
       value: contact.source,
-      options: [{ value: '', label: '-- Chọn nguồn --' }, ...sources.map(s => ({ value: s, label: s }))]
+      options: [
+        { value: '', label: '-- Chọn nguồn --' },
+        ...sources.map(s => ({ value: s.id, label: s.name }))
+      ]
     })}
         </div>
         
-        ${Components.formField('address', 'Địa chỉ', 'text', { value: contact.address })}
-        
-        <hr style="margin: 20px 0; border: none; border-top: 1px solid var(--border-color);">
-        <h4 style="margin-bottom: 15px; color: var(--text-secondary);">📅 Lịch hẹn & Nhắc nhở</h4>
-        
-        <div class="form-row">
-          ${Components.formField('expected_need_date', 'Ngày cần SP', 'date', {
-      value: contact.expected_need_date,
-      hint: 'Khi nào khách dự kiến cần sản phẩm'
+        <!-- Ghi chú -->
+        ${Components.formField('notes', '📝 Ghi chú', 'textarea', {
+      value: contact.notes,
+      placeholder: 'Ghi chú thêm về khách hàng...'
     })}
-          ${Components.formField('reminder_date', 'Ngày nhắc gọi', 'date', {
-      value: contact.reminder_date,
-      hint: 'Hệ thống sẽ nhắc bạn gọi vào ngày này'
-    })}
-        </div>
-        
-        <div class="form-row">
-          ${Components.formField('care_priority', 'Mức ưu tiên', 'select', {
-      value: contact.care_priority || 'normal',
-      options: priorities.map(p => ({ value: p.id, label: p.name }))
-    })}
-          ${Components.formField('zalo_phone', 'SĐT Zalo', 'tel', {
-      value: contact.zalo_phone,
-      placeholder: 'Nếu khác SĐT chính'
-    })}
-        </div>
-        
-        ${Components.formField('reminder_note', 'Ghi chú nhắc nhở', 'textarea', {
-      value: contact.reminder_note,
-      placeholder: 'VD: Hỏi về đơn hàng, giới thiệu sản phẩm mới...'
-    })}
-        
-        ${Components.formField('notes', 'Ghi chú chung', 'textarea', { value: contact.notes })}
       </form>
+      
+      <style>
+        .form-section-title {
+          margin: 20px 0 12px 0;
+          padding-bottom: 8px;
+          border-bottom: 1px solid var(--border-color-light);
+          color: var(--text-secondary);
+          font-size: var(--font-size-sm);
+          font-weight: var(--font-weight-semibold);
+        }
+        .form-section-title:first-child {
+          margin-top: 0;
+        }
+      </style>
     `;
+  },
+
+  // Initialize province/district cascade
+  initProvinceDistrictCascade() {
+    const provinceSelect = document.getElementById('province');
+    const districtSelect = document.getElementById('district');
+
+    if (provinceSelect && districtSelect) {
+      provinceSelect.addEventListener('change', (e) => {
+        const provinceId = e.target.value;
+        const districts = typeof VietnamData !== 'undefined'
+          ? VietnamData.getDistricts(provinceId)
+          : [];
+
+        districtSelect.innerHTML = '<option value="">-- Chọn huyện --</option>' +
+          districts.map(d => `<option value="${d.id}">${d.name}</option>`).join('');
+      });
+    }
+
+    // Update Google Map button
+    const mapInput = document.getElementById('google_map_url');
+    const mapBtn = document.getElementById('openMapBtn');
+    if (mapInput && mapBtn) {
+      mapInput.addEventListener('input', (e) => {
+        const url = e.target.value;
+        mapBtn.href = url || '#';
+        mapBtn.classList.toggle('disabled', !url);
+      });
+    }
   },
 
   async createContact() {

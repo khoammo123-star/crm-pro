@@ -250,7 +250,7 @@ const App = {
         const titles = {
             dashboard: 'Dashboard',
             contacts: 'Liên hệ',
-            companies: 'Công ty',
+            products: 'Sản phẩm',
             deals: 'Deals',
             tasks: 'Công việc'
         };
@@ -266,8 +266,8 @@ const App = {
             case 'contacts':
                 ContactsPage.render();
                 break;
-            case 'companies':
-                CompaniesPage.render();
+            case 'products':
+                ProductsPage.render();
                 break;
             case 'deals':
                 DealsPage.render();

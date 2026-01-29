@@ -407,6 +407,165 @@
     font-weight: var(--font-weight-bold) !important;
 }
 
+/* === PRODUCTS GRID === */
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--spacing-4);
+}
+
+.product-card {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-4);
+    transition: var(--transition-normal);
+}
+
+.product-card:hover {
+    border-color: var(--primary-300);
+    box-shadow: var(--shadow-md);
+}
+
+.product-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: var(--spacing-2);
+}
+
+.product-name {
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    margin: 0;
+}
+
+.product-desc {
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+    margin: 0 0 var(--spacing-3);
+    line-height: 1.5;
+}
+
+.product-meta {
+    display: flex;
+    align-items: baseline;
+    gap: var(--spacing-1);
+}
+
+.product-price {
+    font-weight: var(--font-weight-semibold);
+    color: var(--success-600);
+}
+
+.product-unit {
+    color: var(--text-tertiary);
+    font-size: var(--font-size-sm);
+}
+
+.product-actions {
+    display: flex;
+    gap: var(--spacing-1);
+}
+
+/* === ALERT GRID (Dashboard) === */
+.alert-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--spacing-3);
+}
+
+@media (max-width: 768px) {
+    .alert-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.alert-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-3);
+    padding: var(--spacing-4);
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    transition: var(--transition-normal);
+}
+
+.alert-item:hover {
+    transform: translateY(-2px);
+}
+
+.alert-icon {
+    font-size: 1.5rem;
+}
+
+.alert-info {
+    flex: 1;
+}
+
+.alert-label {
+    font-size: var(--font-size-xs);
+    color: var(--text-secondary);
+    margin-bottom: 2px;
+}
+
+.alert-count {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-bold);
+}
+
+.alert-critical {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.alert-critical .alert-count {
+    color: #dc2626;
+}
+
+.alert-critical .alert-count.has-items {
+    animation: pulse 2s infinite;
+}
+
+.alert-urgent {
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.alert-urgent .alert-count {
+    color: #d97706;
+}
+
+.alert-warning {
+    background: rgba(234, 179, 8, 0.1);
+    border: 1px solid rgba(234, 179, 8, 0.3);
+}
+
+.alert-warning .alert-count {
+    color: #ca8a04;
+}
+
+.alert-item.alert-info {
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.alert-item.alert-info .alert-count {
+    color: #2563eb;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+}
+
 /* === BADGES === */
 .badge {
     display: inline-flex;
